@@ -8,6 +8,6 @@ Some of the features will include but are not limited to:
 * Optimal shopping algorithm - based on an input of items, find out which shop you should go to in order to save the most money
 * Rating system - allows the user to rate particular products (star system + comments)
 * Receipt scanning - Automatically add items from a receipt into the app for later purposes
-
+* Location - find nearest shops? 
 
 Migros api example: https://search-api.migros.ch/products?lang=de&key=migros_components_search&limit=10&offset=0&q=kinder
