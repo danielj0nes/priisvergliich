@@ -1,2 +1,3 @@
+include ':getlocation'
 include ':app'
 rootProject.name = "priisvergliich"
