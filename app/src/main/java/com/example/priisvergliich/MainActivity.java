@@ -85,21 +85,17 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
-        if (menu.getItem(1).getActionView().isFocused()) {
-            menu.getItem(3).setVisible(false);
-        } else {
-            menu.getItem(2).setVisible(true);
-        }
+        MenuItem locationButton = menu.findItem(R.id.cur_location);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                locationButton.setVisible(false);
                 return true;
             }
-
-
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                locationButton.setVisible(true);
                 return true;
             }
         };
