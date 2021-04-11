@@ -1,4 +1,4 @@
-package com.example.priisvergliich;
+package com.danielj.priisvergliich;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +24,8 @@ import com.google.android.gms.tasks.Task;
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
+    UserModel userModel = new UserModel();
+    DatabaseController dbc = new DatabaseController(MainActivity.this);
     FusedLocationProviderClient fusedLocationProviderClient;
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     }
     @RequiresApi(api = Build.VERSION_CODES.P)
     private void getCurrentLocation() {
-        DatabaseHelper db = new DatabaseHelper(MainActivity.this);
         LocationManager lm = (LocationManager) getSystemService(
                 Context.LOCATION_SERVICE
         );
@@ -53,11 +54,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Location> task) {
                         Location location = task.getResult();
                         if (location != null) {
-                            double longitude = location.getLongitude();
-                            double latitude = location.getLatitude();
+                            userModel.setLatitude(location.getLatitude());
+                            userModel.setLongitude(location.getLongitude());
+                            boolean t = dbc.modify(userModel);
+                            double longitude = userModel.getLongitude();
+                            double latitude = userModel.getLatitude();
                             Toast.makeText(
                                     MainActivity.this,
-                                    String.valueOf(longitude) + " " + String.valueOf(latitude),
+                                    String.valueOf(longitude) + " " + String.valueOf(latitude) + " " + String.valueOf(t),
                                     LENGTH_SHORT).show();
                             System.out.println("Success");
                         } else {

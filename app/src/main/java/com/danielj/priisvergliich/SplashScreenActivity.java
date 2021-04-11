@@ -1,4 +1,4 @@
-package com.example.priisvergliich;
+package com.danielj.priisvergliich;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
+
+import com.danielj.priisvergliich.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
