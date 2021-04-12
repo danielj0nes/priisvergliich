@@ -9,5 +9,5 @@ Some of the features will include but are not limited to:
 * Rating system - allows the user to rate particular products (star system + comments)
 * Receipt scanning - Automatically add items from a receipt into the app for later purposes
 * Location - find nearest shops and factor this (and different information) in
-
+t
 Migros api example: https://search-api.migros.ch/products?lang=de&key=migros_components_search&limit=10&offset=0&q=kinder
