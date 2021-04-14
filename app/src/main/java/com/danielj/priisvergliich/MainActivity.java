@@ -1,5 +1,6 @@
-package com.example.priisvergliich;
+package com.danielj.priisvergliich;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
@@ -8,26 +9,25 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.widget.Toast;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class MainActivity extends AppCompatActivity {
-    protected LocationManager locationManager;
-    protected LocationListener locationListener;
-    FusedLocationProviderClient fusedLocationProviderClient;
+import static android.widget.Toast.LENGTH_SHORT;
 
+public class MainActivity extends AppCompatActivity {
+    UserModel userModel = new UserModel();
+    DatabaseController dbc = new DatabaseController(MainActivity.this);
+    FusedLocationProviderClient fusedLocationProviderClient;
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // Permissions handling
@@ -35,16 +35,16 @@ public class MainActivity extends AppCompatActivity {
         == PackageManager.PERMISSION_GRANTED)) {
             getCurrentLocation();
         } else {
-            Toast.makeText(MainActivity.this, "Permission denied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Permission denied", LENGTH_SHORT).show();
         }
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private void getCurrentLocation() {
-        LocationManager locationManager = (LocationManager) getSystemService(
+        LocationManager lm = (LocationManager) getSystemService(
                 Context.LOCATION_SERVICE
         );
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && lm.isLocationEnabled()) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -54,21 +54,28 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Location> task) {
                         Location location = task.getResult();
                         if (location != null) {
-                            double longitude = location.getLongitude();
-                            double latitude = location.getLatitude();
+                            userModel.setLatitude(location.getLatitude());
+                            userModel.setLongitude(location.getLongitude());
+                            boolean t = dbc.modify(userModel);
+                            double longitude = userModel.getLongitude();
+                            double latitude = userModel.getLatitude();
                             Toast.makeText(
                                     MainActivity.this,
-                                    String.valueOf(longitude) + " " + String.valueOf(latitude),
-                                    Toast.LENGTH_SHORT).show();
+                                    String.valueOf(longitude) + " " + String.valueOf(latitude) + " " + String.valueOf(t),
+                                    LENGTH_SHORT).show();
                             System.out.println("Success");
                         } else {
                             Toast.makeText(MainActivity.this,
                                     "Could not get location, please try again",
-                                    Toast.LENGTH_SHORT).show();
+                                    LENGTH_SHORT).show();
                         }
                     }
                 });
             }
+        } else {
+            Toast.makeText(MainActivity.this,
+                    "Please enable location settings",
+                    LENGTH_SHORT).show();
         }
     }
 
@@ -85,21 +92,17 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
-        if (menu.getItem(1).getActionView().isFocused()) {
-            menu.getItem(3).setVisible(false);
-        } else {
-            menu.getItem(2).setVisible(true);
-        }
+        MenuItem locationButton = menu.findItem(R.id.cur_location);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                locationButton.setVisible(false);
                 return true;
             }
-
-
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                locationButton.setVisible(true);
                 return true;
             }
         };
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Location functionality
         MenuItem.OnMenuItemClickListener locationBtnListener = new MenuItem.OnMenuItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.P)
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (ActivityCompat.checkSelfPermission(MainActivity.this,
@@ -121,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(
                                 MainActivity.this,
                                 "Automatic location is not supported",
-                                Toast.LENGTH_SHORT).show();
+                                LENGTH_SHORT).show();
                     }
                 } else {
                     ActivityCompat.requestPermissions(MainActivity.this,

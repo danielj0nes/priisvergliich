@@ -12,6 +12,7 @@
         app:showAsAction="collapseActionView|always"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
+
     <item android:id="@+id/settings"
         android:title="Settings"
         app:showAsAction="never" />
