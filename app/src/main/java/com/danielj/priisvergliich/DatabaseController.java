@@ -38,21 +38,12 @@ public class DatabaseController extends SQLiteOpenHelper {
         long rowCheck = DatabaseUtils.queryNumEntries(db, USER_TABLE);
         if (rowCheck == 0) {
             final long insert = db.insert(USER_TABLE, null, cv);
-            if (insert == -1) {
-                // If insertion fails
-                return false;
-            } else {
-                return true;
-            }
+            // False if fail
+            return insert != -1;
         } else {
             // Otherwise update the entry in user table, since id is always 0, query for it
             final long update = db.update(USER_TABLE, cv, "id = ?", new String[]{"0"});
-            if (update == -1) {
-                // If update fails
-                return false;
-            } else {
-                return true;
-            }
+            return update != -1;
         }
     }
 }
