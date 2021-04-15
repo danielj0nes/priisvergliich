@@ -7,10 +7,25 @@
     tools:context="com.danielj.priisvergliich.MainActivity">
 
     <TextView
+        android:id="@+id/tv_defaultText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="313dp"
         android:gravity="center"
         android:text="Search for a product"
+        android:textColor="#ffffff" />
+
+    <TextView
+        android:id="@+id/tv_queryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="313dp"
+        android:gravity="center"
+        android:text="No results found"
         android:textColor="#ffffff" />
 
 </RelativeLayout>

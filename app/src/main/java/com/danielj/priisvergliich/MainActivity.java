@@ -9,24 +9,45 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
+    private static MainActivity instance;
     UserModel userModel = new UserModel();
     DatabaseController dbc = new DatabaseController(MainActivity.this);
+    RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
+    OkHttpClient client = new OkHttpClient();
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -78,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                     LENGTH_SHORT).show();
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,11 +108,15 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this
         );
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
+        TextView defaultText = (TextView)findViewById(R.id.tv_defaultText);
+        TextView queryText = (TextView)findViewById(R.id.tv_queryText);
+        queryText.setVisibility(View.GONE);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
@@ -109,6 +133,33 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.search).setOnActionExpandListener(searchListener);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Search for a product...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                callSearch(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)){
+                    queryText.setVisibility(View.GONE);
+                    defaultText.setVisibility(View.VISIBLE);
+                } else {
+                    defaultText.setVisibility(View.GONE);
+                    queryText.setVisibility(View.VISIBLE);
+                }
+                return true;
+            }
+            public void callSearch(String query) {
+                rc.getMigrosProducts(query, result -> {
+                    System.out.println("TEST!!!!");
+                    MainActivity.this.runOnUiThread(() -> queryText.setText("result.toString()"));
+                    return result;
+                });
+            }
+        });
 
         // Location functionality
         MenuItem.OnMenuItemClickListener locationBtnListener = new MenuItem.OnMenuItemClickListener() {
