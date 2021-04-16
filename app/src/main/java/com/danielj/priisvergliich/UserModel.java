@@ -15,7 +15,6 @@ public class UserModel {
     // argless constructor
     public UserModel() {
     }
-
     @Override
     public String toString() {
         return "UserModel{" +
@@ -25,35 +24,30 @@ public class UserModel {
                 ", longitude=" + longitude +
                 '}';
     }
-
+    /*
+     * Default get/set method implementations
+     * */
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public double getLatitude() {
         return latitude;
     }
-
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
-
     public double getLongitude() {
         return longitude;
     }
-
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }

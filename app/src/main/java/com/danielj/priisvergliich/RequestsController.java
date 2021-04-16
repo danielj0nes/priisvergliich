@@ -20,12 +20,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class RequestsController {
+    /*Helper interface to get data back from async request functions*/
     public interface ListCallback {
-        /*Helper interface to get data back from async request functions*/
         List<String> onSuccess(List<String> result);
     }
+    /*Helper parse function used in getting Migros product id's from the public "search-api" API*/
     private List<String> parseMigrosIds(String response) {
-        /*Helper parse function used in getting Migros product id's from the public "search-api" API*/
         List<String> data = new ArrayList<String>();
         try {
             JSONObject completeObject = new JSONObject(response);
@@ -42,17 +42,15 @@ public class RequestsController {
         }
         return data;
     }
+    /*Helper function to parse data from the private Migros "web-api" API*/
     private List<String> parseMigrosData(String response) {
-        /*Helper function to parse data from the private Migros "web-api" API*/
         List<String> data = new ArrayList<String>();
         try {
             JSONArray mainArray = new JSONArray(response);
             for (int i = 0; i < mainArray.length(); i++) {
-                String priceVal;
-                JSONObject priceData;
-                JSONObject imageData;
-                String imageSrc;
-                String productName;
+                String priceVal; JSONObject priceData; JSONObject imageData;
+                String imageSrc; String productName; JSONObject productData;
+                String productWeight;
                 JSONObject jso = mainArray.getJSONObject(i);
                 try {
                     priceData = new JSONObject(jso.getString("price_info"));
@@ -60,20 +58,26 @@ public class RequestsController {
                 } catch (JSONException e) {
                     priceVal = "No price data";
                 }
+                try {
+                    productData = new JSONObject(jso.getString("product_tile_infos"));
+                    productWeight = productData.getString("price_sub_text");
+                } catch (JSONException e) {
+                    productWeight = "No weight data";
+                }
                 imageData = new JSONObject(jso.getString("image"));
                 imageSrc = imageData.getString("src");
                 productName = jso.getString("name");
-                System.out.println(priceVal + " " + productName + " " + imageSrc);
+                System.out.println(priceVal + " " + productWeight + " " + productName + " " + imageSrc);
                 }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return data;
     }
+    /*Helper function for getMigrosProducts() as a required first step in obtaining product data
+     * Works by making a request to the public unrestricted search-api and saving the ID values
+     * of products using the parseMigrosID() function*/
     private void getMigrosIds(String query, ListCallback callback) {
-        /*Helper function for getMigrosProducts() as a required first step in obtaining product data
-        * Works by making a request to the public unrestricted search-api and saving the ID values
-        * of products using the parseMigrosID() function*/
         query = query.replaceAll("\\s", "%20");
         String url = "https://search-api.migros.ch/products?lang=de&key=migros_components_search&limit=10&offset=0&q="+query;
         OkHttpClient client = new OkHttpClient();
@@ -98,9 +102,9 @@ public class RequestsController {
             }
         });
     }
+    /*Using the IDs obtained from the search-api, query the web API to get exclusive information
+     * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
     public void getMigrosProducts(String query, ListCallback callback) {
-        /*Using the IDs obtained from the search-api, query the web API to get exclusive information
-        * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
         getMigrosIds(query, new ListCallback() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
