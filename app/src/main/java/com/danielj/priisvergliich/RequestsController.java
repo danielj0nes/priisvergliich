@@ -24,6 +24,9 @@ public class RequestsController {
     public interface ListCallback {
         List<String> onSuccess(List<String> result);
     }
+    public interface ProductCallback {
+        List<ProductModel> onSuccess(List<ProductModel> result);
+    }
     /*Helper parse function used in getting Migros product id's from the public "search-api" API*/
     private List<String> parseMigrosIds(String response) {
         List<String> data = new ArrayList<String>();
@@ -43,36 +46,34 @@ public class RequestsController {
         return data;
     }
     /*Helper function to parse data from the private Migros "web-api" API*/
-    private List<String> parseMigrosData(String response) {
-        List<String> data = new ArrayList<String>();
+    private List<ProductModel> parseMigrosData(String response) {
+        List<ProductModel> products = new ArrayList<>();
         try {
             JSONArray mainArray = new JSONArray(response);
             for (int i = 0; i < mainArray.length(); i++) {
-                String priceVal; JSONObject priceData; JSONObject imageData;
-                String imageSrc; String productName; JSONObject productData;
-                String productWeight;
+                ProductModel product = new ProductModel();
                 JSONObject jso = mainArray.getJSONObject(i);
                 try {
-                    priceData = new JSONObject(jso.getString("price_info"));
-                    priceVal = priceData.getString("price");
+                    JSONObject priceData = new JSONObject(jso.getString("price_info"));
+                    product.setProductPrice(priceData.getString("price"));
                 } catch (JSONException e) {
-                    priceVal = "No price data";
+                    product.setProductPrice("Null");
                 }
                 try {
-                    productData = new JSONObject(jso.getString("product_tile_infos"));
-                    productWeight = productData.getString("price_sub_text");
+                    JSONObject productData = new JSONObject(jso.getString("product_tile_infos"));
+                    product.setProductInfo(productData.getString("price_sub_text"));
                 } catch (JSONException e) {
-                    productWeight = "No weight data";
+                    product.setProductInfo("Null");
                 }
-                imageData = new JSONObject(jso.getString("image"));
-                imageSrc = imageData.getString("src");
-                productName = jso.getString("name");
-                System.out.println(priceVal + " " + productWeight + " " + productName + " " + imageSrc);
+                JSONObject imageData = new JSONObject(jso.getString("image"));
+                product.setImageSrc(imageData.getString("src"));
+                product.setProductName(jso.getString("name"));
+                products.add(product);
                 }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return data;
+        return products;
     }
     /*Helper function for getMigrosProducts() as a required first step in obtaining product data
      * Works by making a request to the public unrestricted search-api and saving the ID values
@@ -104,7 +105,7 @@ public class RequestsController {
     }
     /*Using the IDs obtained from the search-api, query the web API to get exclusive information
      * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
-    public void getMigrosProducts(String query, ListCallback callback) {
+    public void getMigrosProducts(String query, ProductCallback callback) {
         getMigrosIds(query, new ListCallback() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override

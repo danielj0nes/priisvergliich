@@ -3,10 +3,10 @@ package com.danielj.priisvergliich;
 public class ProductModel {
     private String productName;
     private String imageSrc;
-    private double productPrice;
+    private String productPrice;
     private String productInfo;
 
-    public ProductModel(String productName, String imageSrc, double productPrice, String productInfo) {
+    public ProductModel(String productName, String imageSrc, String productPrice, String productInfo) {
         this.productName = productName;
         this.imageSrc = imageSrc;
         this.productPrice = productPrice;
@@ -38,10 +38,10 @@ public class ProductModel {
     public void setImageSrc(String imageSrc) {
         this.imageSrc = imageSrc;
     }
-    public double getProductPrice(double productPrice) {
+    public String getProductPrice(String productPrice) {
         return productPrice;
     }
-    public void setProductPrice(double productPrice) {
+    public void setProductPrice(String productPrice) {
         this.productPrice = productPrice;
     }
     public String getProductInfo(String productInfo) {

@@ -23,21 +23,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -156,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
                 rc.getMigrosProducts(query, result -> {
                     System.out.println("Data received");
                     MainActivity.this.runOnUiThread(() -> queryText.setText("It worked ;-)"));
+                    for (ProductModel product : result) {
+                        System.out.println(product.getProductName());
+                    }
                     return result;
                 });
             }
