@@ -154,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
             }
             public void callSearch(String query) {
                 rc.getMigrosProducts(query, result -> {
-                    System.out.println("TEST!!!!");
-                    MainActivity.this.runOnUiThread(() -> queryText.setText("result.toString()"));
+                    System.out.println("Data received");
+                    MainActivity.this.runOnUiThread(() -> queryText.setText("It worked ;-)"));
                     return result;
                 });
             }
