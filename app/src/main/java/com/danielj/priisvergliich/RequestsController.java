@@ -8,10 +8,17 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.DataNode;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -26,6 +33,10 @@ public class RequestsController {
     }
     public interface ProductCallback {
         List<ProductModel> onSuccess(List<ProductModel> result);
+    }
+    public interface StringCallback {
+        // For debugging
+        String onSuccess(String result);
     }
     /*Helper parse function used in getting Migros product id's from the public "search-api" API*/
     private List<String> parseMigrosIds(String response) {
@@ -73,6 +84,31 @@ public class RequestsController {
                 }
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        return products;
+    }
+    private List<ProductModel> parseCoopData(String response) {
+        List<ProductModel> products = new ArrayList<>();
+        Document doc = Jsoup.parse(response);
+        Elements scripts = doc.getElementsByTag("script");
+        for (Element script : scripts) {
+            if (script.data().contains("utag_data")) {
+                Pattern pattern = Pattern.compile(".*utag_data = ([^;]*)");
+                Matcher matcher = pattern.matcher(script.data());
+                if (matcher.find()) {
+                    try {
+                        JSONObject completeObject = new JSONObject(matcher.group(1));
+                        System.out.println(completeObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println(matcher.group(1));
+                } else {
+                    // Handle
+                }
+                break;
+            }
         }
         return products;
     }
@@ -133,6 +169,31 @@ public class RequestsController {
                 }
             });
             return result;
+        });
+    }
+    public void getCoopProducts(String query, StringCallback callback) {
+        query = query.replaceAll("\\s", "%20");
+        String url = "https://www.coop.ch/en/search/?text="+query;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String queryResponse = response.body().string();
+                    parseCoopData(queryResponse);
+                    callback.onSuccess(queryResponse);
+                } else {
+                    // Handle
+                }
+            }
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 }

@@ -188,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(newText)){
                     listView.setVisibility(View.GONE);
                 } else {
-                    callSearch(newText);
                     listView.setVisibility(View.VISIBLE);
                 }
                 return true;
@@ -200,6 +199,9 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.runOnUiThread(() ->
                             listView.setAdapter(adapter)
                     );
+                    return result;
+                });
+                rc.getCoopProducts(query, result -> {
                     return result;
                 });
             }
