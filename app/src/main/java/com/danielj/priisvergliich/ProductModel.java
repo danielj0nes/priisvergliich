@@ -38,13 +38,13 @@ public class ProductModel {
     public void setImageSrc(String imageSrc) {
         this.imageSrc = imageSrc;
     }
-    public String getProductPrice(String productPrice) {
+    public String getProductPrice() {
         return productPrice;
     }
     public void setProductPrice(String productPrice) {
         this.productPrice = productPrice;
     }
-    public String getProductInfo(String productInfo) {
+    public String getProductInfo() {
         return productInfo;
     }
     public void setProductInfo(String productInfo) {

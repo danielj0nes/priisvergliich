@@ -1,5 +1,6 @@
 package com.danielj.priisvergliich;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -10,19 +11,28 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import okhttp3.OkHttpClient;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -94,15 +104,31 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this
         );
     }
+    class ProductAdapter extends ArrayAdapter<ProductModel> {
+        public ProductAdapter(Context context, List<ProductModel> products) {
+            super(context, 0, products);
+        }
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            ProductModel product = getItem(position);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.row, parent, false);
+            }
+            TextView tvProductName = (TextView) convertView.findViewById(R.id.tv_productName);
+            TextView tvProductInfo = (TextView) convertView.findViewById(R.id.tv_productInfo);
+            tvProductName.setText(product.getProductName());
+            tvProductInfo.setText(product.getProductInfo());
+            return convertView;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
-        TextView defaultText = (TextView)findViewById(R.id.tv_defaultText);
-        TextView queryText = (TextView)findViewById(R.id.tv_queryText);
-        queryText.setVisibility(View.GONE);
+        ListView listView = (ListView) findViewById(R.id.lv_productList);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
@@ -130,21 +156,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText)){
-                    queryText.setVisibility(View.GONE);
-                    defaultText.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
                 } else {
-                    defaultText.setVisibility(View.GONE);
-                    queryText.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.VISIBLE);
                 }
                 return true;
             }
             public void callSearch(String query) {
                 rc.getMigrosProducts(query, result -> {
                     System.out.println("Data received");
-                    MainActivity.this.runOnUiThread(() -> queryText.setText("It worked ;-)"));
-                    for (ProductModel product : result) {
-                        System.out.println(product.getProductName());
-                    }
+                    ProductAdapter adapter = new ProductAdapter(MainActivity.this, result);
+
+                    MainActivity.this.runOnUiThread(() ->
+                            listView.setAdapter(adapter)
+                    );
                     return result;
                 });
             }
