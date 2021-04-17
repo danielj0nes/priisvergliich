@@ -8,6 +8,9 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -30,20 +33,39 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
-    private static MainActivity instance;
     UserModel userModel = new UserModel();
     DatabaseController dbc = new DatabaseController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
-    OkHttpClient client = new OkHttpClient();
+    private class LoadImage extends AsyncTask<String, Void, Bitmap> {
+        ImageView imageView;
+        public LoadImage (ImageView imageView) {
+            this.imageView = imageView;
+        }
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            String src = strings[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream inputStream = new java.net.URL(src).openStream();
+                bitmap = BitmapFactory.decodeStream(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bitmap;
+        }
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -115,10 +137,17 @@ public class MainActivity extends AppCompatActivity {
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.row, parent, false);
             }
-            TextView tvProductName = (TextView) convertView.findViewById(R.id.tv_productName);
-            TextView tvProductInfo = (TextView) convertView.findViewById(R.id.tv_productInfo);
+            TextView tvProductName = convertView.findViewById(R.id.tv_productName);
+            TextView tvProductPrice = convertView.findViewById(R.id.tv_productPrice);
+            TextView tvProductInfo = convertView.findViewById(R.id.tv_productInfo);
+            TextView tvProductOrigin = convertView.findViewById(R.id.tv_productOrigin);
+            ImageView ivImageSrc = convertView.findViewById(R.id.iv_productImage);
+            LoadImage loadImage = new LoadImage(ivImageSrc);
+            loadImage.execute(product.getImageSrc());
             tvProductName.setText(product.getProductName());
+            tvProductPrice.setText(product.getProductPrice());
             tvProductInfo.setText(product.getProductInfo());
+            tvProductOrigin.setText(product.getProductOrigin());
             return convertView;
         }
     }
@@ -128,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
-        ListView listView = (ListView) findViewById(R.id.lv_productList);
+        ListView listView = findViewById(R.id.lv_productList);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
@@ -146,27 +175,28 @@ public class MainActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Search for a product...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 callSearch(query);
                 return true;
             }
-
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText)){
                     listView.setVisibility(View.GONE);
                 } else {
+                    callSearch(newText);
                     listView.setVisibility(View.VISIBLE);
                 }
                 return true;
             }
+            @RequiresApi(api = Build.VERSION_CODES.O)
             public void callSearch(String query) {
                 rc.getMigrosProducts(query, result -> {
-                    System.out.println("Data received");
                     ProductAdapter adapter = new ProductAdapter(MainActivity.this, result);
-
                     MainActivity.this.runOnUiThread(() ->
                             listView.setAdapter(adapter)
                     );
@@ -174,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
         // Location functionality
         MenuItem.OnMenuItemClickListener locationBtnListener = new MenuItem.OnMenuItemClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.P)

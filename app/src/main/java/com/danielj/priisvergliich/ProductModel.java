@@ -5,12 +5,14 @@ public class ProductModel {
     private String imageSrc;
     private String productPrice;
     private String productInfo;
+    private String productOrigin;
 
-    public ProductModel(String productName, String imageSrc, String productPrice, String productInfo) {
+    public ProductModel(String productName, String imageSrc, String productPrice, String productInfo, String productOrigin) {
         this.productName = productName;
         this.imageSrc = imageSrc;
         this.productPrice = productPrice;
         this.productInfo = productInfo; // e.g. weight / quantity
+        this.productOrigin = productOrigin;
     }
     public ProductModel() {
     }
@@ -49,5 +51,11 @@ public class ProductModel {
     }
     public void setProductInfo(String productInfo) {
         this.productInfo = productInfo;
+    }
+    public String getProductOrigin() {
+        return productOrigin;
+    }
+    public void setProductOrigin(String productOrigin) {
+        this.productOrigin = productOrigin;
     }
 }

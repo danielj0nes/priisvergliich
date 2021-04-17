@@ -68,6 +68,7 @@ public class RequestsController {
                 JSONObject imageData = new JSONObject(jso.getString("image"));
                 product.setImageSrc(imageData.getString("src"));
                 product.setProductName(jso.getString("name"));
+                product.setProductOrigin("Migros");
                 products.add(product);
                 }
         } catch (JSONException e) {
@@ -105,36 +106,33 @@ public class RequestsController {
     }
     /*Using the IDs obtained from the search-api, query the web API to get exclusive information
      * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void getMigrosProducts(String query, ProductCallback callback) {
-        getMigrosIds(query, new ListCallback() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public List<String> onSuccess(List<String> result) {
-                String formattedIds = String.join("%2c", result);
-                OkHttpClient client = new OkHttpClient();
-                String url = "https://web-api.migros.ch/widgets/product_fragments_json?ids=" +
-                        formattedIds + "&lang=de&limit=12&offset=0&key=5reweDEbruthex8s";
-                Request request = new Request.Builder()
-                        .url(url)
-                        .header("Origin", "https://www.migros.ch") // Header required
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        e.printStackTrace();
+        getMigrosIds(query, result -> {
+            String formattedIds = String.join("%2c", result);
+            OkHttpClient client = new OkHttpClient();
+            String url = "https://web-api.migros.ch/widgets/product_fragments_json?ids=" +
+                    formattedIds + "&lang=de&limit=12&offset=0&key=5reweDEbruthex8s";
+            Request request = new Request.Builder()
+                    .url(url)
+                    .header("Origin", "https://www.migros.ch") // Header required
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    e.printStackTrace();
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String queryResponse = response.body().string();
+                        callback.onSuccess(parseMigrosData(queryResponse));
+                    } else {
+                        // Handle
                     }
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            String queryResponse = response.body().string();
-                            callback.onSuccess(parseMigrosData(queryResponse));
-                        } else {
-                            // Handle
-                        }
-                    }
-                });
-                return result;
-            }
+                }
+            });
+            return result;
         });
     }
 }
