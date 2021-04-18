@@ -98,13 +98,13 @@ public class RequestsController {
                 if (matcher.find()) {
                     try {
                         JSONObject completeObject = new JSONObject(matcher.group(1));
-                        System.out.println(completeObject);
+                        JSONArray t = completeObject.getJSONArray("product_productInfo_productName");
+                        System.out.println(t);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    System.out.println(matcher.group(1));
                 } else {
+                    System.out.println("Not found");
                     // Handle
                 }
                 break;
@@ -117,7 +117,7 @@ public class RequestsController {
      * of products using the parseMigrosID() function*/
     private void getMigrosIds(String query, ListCallback callback) {
         query = query.replaceAll("\\s", "%20");
-        String url = "https://search-api.migros.ch/products?lang=de&key=migros_components_search&limit=10&offset=0&q="+query;
+        String url = "https://search-api.migros.ch/products?lang=de&key=migros_components_search&limit=20&offset=0&q="+query;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -148,7 +148,7 @@ public class RequestsController {
             String formattedIds = String.join("%2c", result);
             OkHttpClient client = new OkHttpClient();
             String url = "https://web-api.migros.ch/widgets/product_fragments_json?ids=" +
-                    formattedIds + "&lang=de&limit=12&offset=0&key=5reweDEbruthex8s";
+                    formattedIds + "&lang=de&limit=20&offset=0&key=5reweDEbruthex8s";
             Request request = new Request.Builder()
                     .url(url)
                     .header("Origin", "https://www.migros.ch") // Header required
@@ -173,7 +173,7 @@ public class RequestsController {
     }
     public void getCoopProducts(String query, StringCallback callback) {
         query = query.replaceAll("\\s", "%20");
-        String url = "https://www.coop.ch/en/search/?text="+query;
+        String url = "https://www.coop.ch/de/search/?text="+query;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
