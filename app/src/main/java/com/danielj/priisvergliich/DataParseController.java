@@ -72,6 +72,7 @@ public class DataParseController {
         return products;
     }
     public List<ProductModel> parseCoopData(String response) {
+        // To do: get weight info
         List<ProductModel> products = new ArrayList<>();
         Document doc = Jsoup.parse(response);
         Elements scripts = doc.getElementsByTag("script");
