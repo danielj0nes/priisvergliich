@@ -1,5 +1,8 @@
 package com.danielj.priisvergliich;
 
+/*
+* Class model for a product in the app. Standard default get/set method implementations.
+* */
 public class ProductModel {
     private String productName;
     private String imageSrc;
@@ -15,6 +18,9 @@ public class ProductModel {
         this.productOrigin = productOrigin;
     }
     public ProductModel() {
+        // Default variable initilisations.
+        this.productPrice = "No price information available";
+        this.productInfo = "";
     }
     @Override
     public String toString() {
@@ -25,9 +31,6 @@ public class ProductModel {
                 ", productInfo=" + productInfo +
                 '}';
     }
-    /*
-    * Default get/set method implementations
-    * */
     public String getProductName() {
         return productName;
     }

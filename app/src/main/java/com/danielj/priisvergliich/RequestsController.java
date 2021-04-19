@@ -26,105 +26,20 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
+/*
+* This controller manages all of the functions related to requests made using OkHttp.
+* The syntax of the requests are asynchronous - using callbacks specifically.
+* The functions work in conjunction with the data parsers to build ProductModel classes which are
+* then sent to the main thread of the application.
+* */
 public class RequestsController {
-    /*Helper interface to get data back from async request functions*/
+    DataParseController dataparser = new DataParseController();
+    /*Helper interfaces to get data back from async request functions*/
     public interface ListCallback {
-        List<String> onSuccess(List<String> result);
+        void onSuccess(List<String> result);
     }
     public interface ProductCallback {
-        List<ProductModel> onSuccess(List<ProductModel> result);
-    }
-    public interface StringCallback {
-        // For debugging
-        String onSuccess(String result);
-    }
-    /*Helper parse function used in getting Migros product id's from the public "search-api" API*/
-    private List<String> parseMigrosIds(String response) {
-        List<String> data = new ArrayList<String>();
-        try {
-            JSONObject completeObject = new JSONObject(response);
-            JSONArray results = completeObject.getJSONArray("results");
-            for (int i = 0; i < results.length(); i++) {
-                // Loop through the results, grab product ID's, append to list
-                JSONObject jo = results.getJSONObject(i);
-                JSONObject idData = jo.getJSONObject("_product");
-                String id = idData.optString("id");
-                data.add(id);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
-    /*Helper function to parse data from the private Migros "web-api" API*/
-    private List<ProductModel> parseMigrosData(String response) {
-        List<ProductModel> products = new ArrayList<>();
-        try {
-            JSONArray mainArray = new JSONArray(response);
-            for (int i = 0; i < mainArray.length(); i++) {
-                ProductModel product = new ProductModel();
-                JSONObject jso = mainArray.getJSONObject(i);
-                try {
-                    JSONObject priceData = new JSONObject(jso.getString("price_info"));
-                    product.setProductPrice(priceData.getString("price"));
-                } catch (JSONException e) {
-                    product.setProductPrice("Null");
-                }
-                try {
-                    JSONObject productData = new JSONObject(jso.getString("product_tile_infos"));
-                    product.setProductInfo(productData.getString("price_sub_text"));
-                } catch (JSONException e) {
-                    product.setProductInfo("Null");
-                }
-                JSONObject imageData = new JSONObject(jso.getString("image"));
-                product.setImageSrc(imageData.getString("src"));
-                product.setProductName(jso.getString("name"));
-                product.setProductOrigin("Migros");
-                products.add(product);
-                }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return products;
-    }
-    private List<ProductModel> parseCoopData(String response) {
-        List<ProductModel> products = new ArrayList<>();
-        Document doc = Jsoup.parse(response);
-        Elements scripts = doc.getElementsByTag("script");
-        for (Element script : scripts) {
-            if (script.data().contains("utag_data")) {
-                Pattern pattern = Pattern.compile(".*utag_data = ([^;]*)");
-                Matcher matcher = pattern.matcher(script.data());
-                if (matcher.find()) {
-                    try {
-                        JSONObject jso = new JSONObject(matcher.group(1));
-                        JSONArray productNames = jso.getJSONArray("product_productInfo_productName");
-                        JSONArray productPrices = jso.getJSONArray("product_attributes_basePrice");
-                        JSONArray productIds = jso.getJSONArray("product_productInfo_sku");
-                        String baseUrl = "https://www.coop.ch/img/produkte/310_310/RGB/";
-                        for (int i = 0; i < productNames.length(); i++) {
-                            ProductModel product = new ProductModel();
-                            String productUrl = baseUrl + productIds.getString(i) + "_001.jpg?_=1581484027184";
-                            product.setProductName(productNames.getString(i));
-                            product.setProductPrice(productPrices.getString(i));
-                            product.setImageSrc(productUrl);
-                            product.setProductInfo("");
-                            product.setProductOrigin("Coop");
-                            products.add(product);
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    System.out.println("Not found");
-                    // Handle
-                }
-                break;
-            }
-        }
-        return products;
+        void onSuccess(List<ProductModel> result);
     }
     /*Helper function for getMigrosProducts() as a required first step in obtaining product data
      * Works by making a request to the public unrestricted search-api and saving the ID values
@@ -142,7 +57,7 @@ public class RequestsController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String queryResponse = response.body().string();
-                    List<String> parsed = parseMigrosIds(queryResponse);
+                    List<String> parsed = dataparser.parseMigrosIds(queryResponse);
                     callback.onSuccess(parsed);
                 } else {
                     // Handle
@@ -156,20 +71,6 @@ public class RequestsController {
     }
     /*Using the IDs obtained from the search-api, query the web API to get exclusive information
      * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<ProductModel> getAllProducts(String query) throws IOException {
-        List<ProductModel> products = new ArrayList<>();
-        OkHttpClient client = new OkHttpClient();
-        query = query.replaceAll("\\s", "%20");
-        String url = "https://www.coop.ch/de/search/?text="+query;
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        products.addAll(parseCoopData(response.body().string()));
-        return products;
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void getMigrosProducts(String query, ProductCallback callback) {
         getMigrosIds(query, result -> {
@@ -190,13 +91,12 @@ public class RequestsController {
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     if (response.isSuccessful()) {
                         String queryResponse = response.body().string();
-                        callback.onSuccess(parseMigrosData(queryResponse));
+                        callback.onSuccess(dataparser.parseMigrosData(queryResponse));
                     } else {
                         // Handle
                     }
                 }
             });
-            return result;
         });
     }
     public void getCoopProducts(String query, ProductCallback callback) {
@@ -212,7 +112,7 @@ public class RequestsController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String queryResponse = response.body().string();
-                    callback.onSuccess(parseCoopData(queryResponse));
+                    callback.onSuccess(dataparser.parseCoopData(queryResponse));
                 } else {
                     // Handle
                 }

@@ -41,10 +41,12 @@ import java.util.List;
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class MainActivity extends AppCompatActivity {
+    /*Class instantiations*/
     UserModel userModel = new UserModel();
     DatabaseController dbc = new DatabaseController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
+
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
@@ -89,26 +91,23 @@ public class MainActivity extends AppCompatActivity {
                     == PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        Location location = task.getResult();
-                        if (location != null) {
-                            userModel.setLatitude(location.getLatitude());
-                            userModel.setLongitude(location.getLongitude());
-                            boolean t = dbc.modify(userModel);
-                            double longitude = userModel.getLongitude();
-                            double latitude = userModel.getLatitude();
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    String.valueOf(longitude) + " " + String.valueOf(latitude) + " " + String.valueOf(t),
-                                    LENGTH_SHORT).show();
-                            System.out.println("Success");
-                        } else {
-                            Toast.makeText(MainActivity.this,
-                                    "Could not get location, please try again",
-                                    LENGTH_SHORT).show();
-                        }
+                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
+                    Location location = task.getResult();
+                    if (location != null) {
+                        userModel.setLatitude(location.getLatitude());
+                        userModel.setLongitude(location.getLongitude());
+                        boolean t = dbc.modify(userModel);
+                        double longitude = userModel.getLongitude();
+                        double latitude = userModel.getLatitude();
+                        Toast.makeText(
+                                MainActivity.this,
+                                longitude + " " + latitude + " " + t,
+                                LENGTH_SHORT).show();
+                        System.out.println("Success");
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Could not get location, please try again",
+                                LENGTH_SHORT).show();
                     }
                 });
             }
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             return convertView;
         }
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -201,43 +200,34 @@ public class MainActivity extends AppCompatActivity {
                     rc.getCoopProducts(query, resultCoop -> {
                         products.addAll(resultCoop);
                         ProductAdapter adapter = new ProductAdapter(MainActivity.this, products);
-                        for (ProductModel p : products) {
-                            System.out.println(p);
-                        }
                         MainActivity.this.runOnUiThread(() ->
                                 listView.setAdapter(adapter)
                         );
-                        return resultCoop;
                     });
-                    return resultMigros;
                 });
             }
         });
         // Location functionality
-        MenuItem.OnMenuItemClickListener locationBtnListener = new MenuItem.OnMenuItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.P)
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (ActivityCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        getCurrentLocation();
-                    } else {
-                        Toast.makeText(
-                                MainActivity.this,
-                                "Automatic location is not supported",
-                                LENGTH_SHORT).show();
-                    }
+        MenuItem.OnMenuItemClickListener locationBtnListener = item -> {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getCurrentLocation();
                 } else {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
-                            100);
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Automatic location is not supported",
+                            LENGTH_SHORT).show();
                 }
-                return true;
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION},
+                        100);
             }
+            return true;
         };
         menu.findItem(R.id.cur_location).setOnMenuItemClickListener(locationBtnListener);
         return true;

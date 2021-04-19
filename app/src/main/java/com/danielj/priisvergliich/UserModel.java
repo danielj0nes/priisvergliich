@@ -1,5 +1,8 @@
 package com.danielj.priisvergliich;
 
+/*
+Class model for the 'User' of the app. Default method implementations.
+*/
 public class UserModel {
     private int id;
     private String name;
@@ -12,7 +15,6 @@ public class UserModel {
         this.latitude = latitude;
         this.longitude = longitude;
     }
-    // argless constructor
     public UserModel() {
     }
     @Override
