@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -194,15 +195,21 @@ public class MainActivity extends AppCompatActivity {
             }
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void callSearch(String query) {
-                rc.getMigrosProducts(query, result -> {
-                    ProductAdapter adapter = new ProductAdapter(MainActivity.this, result);
-                    MainActivity.this.runOnUiThread(() ->
-                            listView.setAdapter(adapter)
-                    );
-                    return result;
-                });
-                rc.getCoopProducts(query, result -> {
-                    return result;
+                List<ProductModel> products = new ArrayList<>();
+                rc.getMigrosProducts(query, resultMigros -> {
+                    products.addAll(resultMigros);
+                    rc.getCoopProducts(query, resultCoop -> {
+                        products.addAll(resultCoop);
+                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, products);
+                        for (ProductModel p : products) {
+                            System.out.println(p);
+                        }
+                        MainActivity.this.runOnUiThread(() ->
+                                listView.setAdapter(adapter)
+                        );
+                        return resultCoop;
+                    });
+                    return resultMigros;
                 });
             }
         });

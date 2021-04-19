@@ -17,6 +17,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,9 +98,22 @@ public class RequestsController {
                 Matcher matcher = pattern.matcher(script.data());
                 if (matcher.find()) {
                     try {
-                        JSONObject completeObject = new JSONObject(matcher.group(1));
-                        JSONArray t = completeObject.getJSONArray("product_productInfo_productName");
-                        System.out.println(t);
+                        JSONObject jso = new JSONObject(matcher.group(1));
+                        JSONArray productNames = jso.getJSONArray("product_productInfo_productName");
+                        JSONArray productPrices = jso.getJSONArray("product_attributes_basePrice");
+                        JSONArray productIds = jso.getJSONArray("product_productInfo_sku");
+                        String baseUrl = "https://www.coop.ch/img/produkte/310_310/RGB/";
+                        for (int i = 0; i < productNames.length(); i++) {
+                            ProductModel product = new ProductModel();
+                            String productUrl = baseUrl + productIds.getString(i) + "_001.jpg?_=1581484027184";
+                            product.setProductName(productNames.getString(i));
+                            product.setProductPrice(productPrices.getString(i));
+                            product.setImageSrc(productUrl);
+                            product.setProductInfo("");
+                            product.setProductOrigin("Coop");
+                            products.add(product);
+                        }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -143,6 +157,20 @@ public class RequestsController {
     /*Using the IDs obtained from the search-api, query the web API to get exclusive information
      * such as pricing. Used in conjunction with parseMigrosData() to build list of Product classes*/
     @RequiresApi(api = Build.VERSION_CODES.O)
+    public List<ProductModel> getAllProducts(String query) throws IOException {
+        List<ProductModel> products = new ArrayList<>();
+        OkHttpClient client = new OkHttpClient();
+        query = query.replaceAll("\\s", "%20");
+        String url = "https://www.coop.ch/de/search/?text="+query;
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        products.addAll(parseCoopData(response.body().string()));
+        return products;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void getMigrosProducts(String query, ProductCallback callback) {
         getMigrosIds(query, result -> {
             String formattedIds = String.join("%2c", result);
@@ -171,7 +199,7 @@ public class RequestsController {
             return result;
         });
     }
-    public void getCoopProducts(String query, StringCallback callback) {
+    public void getCoopProducts(String query, ProductCallback callback) {
         query = query.replaceAll("\\s", "%20");
         String url = "https://www.coop.ch/de/search/?text="+query;
         OkHttpClient client = new OkHttpClient();
@@ -184,8 +212,7 @@ public class RequestsController {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String queryResponse = response.body().string();
-                    parseCoopData(queryResponse);
-                    callback.onSuccess(queryResponse);
+                    callback.onSuccess(parseCoopData(queryResponse));
                 } else {
                     // Handle
                 }
