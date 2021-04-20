@@ -29,7 +29,8 @@ public class ProductModel {
                 ", imageSrc='" + imageSrc + '\'' +
                 ", productPrice=" + productPrice +
                 ", productInfo=" + productInfo +
-                '}';
+                ", productOrigin=" + productOrigin +
+                ";";
     }
     public String getProductName() {
         return productName;

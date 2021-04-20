@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,5 +110,60 @@ public class DataParseController {
             }
         }
         return products;
+    }
+    /*
+    * A primitive attempt at a relevance sorting algorithm. Based on a threshold, take lower index
+    * results from each company and create a new intertwined list of products. Idea based on the
+    * assumption that retrieved products are already mostly relevance sorted.
+    * */
+    public List<ProductModel> sortRelevance(List<ProductModel> products, int threshold) {
+        List<ProductModel> relevantProducts = new ArrayList<>();
+        List<ProductModel> migrosProducts = new ArrayList<>();
+        List<ProductModel> coopProducts = new ArrayList<>();
+        for (ProductModel product : products) {
+            switch (product.getProductOrigin()) {
+                case "Migros":
+                    migrosProducts.add(product);
+                    break;
+                case "Coop":
+                    coopProducts.add(product);
+                    break;
+            }
+        }
+        if (migrosProducts.size() > threshold && coopProducts.size() > threshold) {
+            for (int i = 0; i <= threshold - 1; i++) {
+                relevantProducts.add(migrosProducts.get(i));
+                relevantProducts.add(coopProducts.get(i));
+            }
+            if (migrosProducts.size() < coopProducts.size()) {
+                relevantProducts.addAll(migrosProducts.subList(threshold, migrosProducts.size() - 1));
+                relevantProducts.addAll(coopProducts.subList(threshold, coopProducts.size() - 1));
+            } else {
+                relevantProducts.addAll(coopProducts.subList(threshold, coopProducts.size() - 1));
+                relevantProducts.addAll(migrosProducts.subList(threshold, migrosProducts.size() - 1));
+            }
+            return relevantProducts;
+        }
+        else if (migrosProducts.size() != 0 && coopProducts.size() != 0) {
+            relevantProducts.add(migrosProducts.remove(0));
+            relevantProducts.add(coopProducts.remove(0));
+            if (migrosProducts.size() < coopProducts.size()) {
+                relevantProducts.addAll(migrosProducts);
+                relevantProducts.addAll(coopProducts);
+            } else {
+                relevantProducts.addAll(coopProducts);
+                relevantProducts.addAll(migrosProducts);
+            }
+            return relevantProducts;
+        } else {
+            if (migrosProducts.size() < coopProducts.size()) {
+                relevantProducts.addAll(migrosProducts);
+                relevantProducts.addAll(coopProducts);
+            } else {
+                relevantProducts.addAll(coopProducts);
+                relevantProducts.addAll(migrosProducts);
+            }
+            return relevantProducts;
+        }
     }
 }

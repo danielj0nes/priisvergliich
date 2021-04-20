@@ -44,6 +44,7 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class MainActivity extends AppCompatActivity {
     /*Class instantiations*/
     UserModel userModel = new UserModel();
+    DataParseController dpc = new DataParseController();
     DatabaseController dbc = new DatabaseController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     products.addAll(resultMigros);
                     rc.getCoopProducts(query, resultCoop -> {
                         products.addAll(resultCoop);
-                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, products);
+                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, dpc.sortRelevance(products, 3));
                         MainActivity.this.runOnUiThread(() -> {
                             listView.setAdapter(adapter);
                             loadingBar.setVisibility(View.GONE);
