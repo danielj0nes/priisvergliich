@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    >
+
+    <ImageView
+        android:id="@+id/iv_productImage"
+        android:layout_width="105dp"
+        android:layout_height="105dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Product name"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            android:layout_margin="2dp"
+            android:textSize="20sp"
+            android:id="@+id/tv_productName"
+            />
+
+        <TextView
+            android:id="@+id/tv_productPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:text="Product price"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_productInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Product info"
+            android:textColor="#a9a9a9"
+            android:layout_margin="2dp"
+            android:textSize="15sp"
+
+            />
+        <TextView
+            android:id="@+id/tv_productOrigin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Product origin"
+            android:textColor="#a9a9a9"
+            android:layout_margin="2dp"
+            android:textSize="15sp"
+            />
+
+    </LinearLayout>
+</LinearLayout>
