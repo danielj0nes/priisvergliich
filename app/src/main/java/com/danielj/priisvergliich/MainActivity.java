@@ -26,6 +26,7 @@ import android.location.LocationManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -171,11 +172,10 @@ public class MainActivity extends AppCompatActivity {
         };
         menu.findItem(R.id.search).setOnActionExpandListener(searchListener);
         ListView listView = findViewById(R.id.lv_productList);
+        ProgressBar loadingBar = findViewById(R.id.progressBar);
+        loadingBar.setVisibility(View.GONE);
         // Search functionality
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        MenuItem sv = menu.findItem(R.id.search);
-        sv.expandActionView();
-        searchView.clearFocus();
         searchView.setQueryHint("Search for a product...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -195,14 +195,16 @@ public class MainActivity extends AppCompatActivity {
             }
             public void callSearch(String query) {
                 List<ProductModel> products = new ArrayList<>();
+                loadingBar.setVisibility(View.VISIBLE);
                 rc.getMigrosProducts(query, resultMigros -> {
                     products.addAll(resultMigros);
                     rc.getCoopProducts(query, resultCoop -> {
                         products.addAll(resultCoop);
                         ProductAdapter adapter = new ProductAdapter(MainActivity.this, products);
-                        MainActivity.this.runOnUiThread(() ->
-                                listView.setAdapter(adapter)
-                        );
+                        MainActivity.this.runOnUiThread(() -> {
+                            listView.setAdapter(adapter);
+                            loadingBar.setVisibility(View.GONE);
+                        });
                     });
                 });
             }
