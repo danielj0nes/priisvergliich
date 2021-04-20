@@ -19,7 +19,7 @@ public class ProductModel {
     }
     public ProductModel() {
         // Default variable initilisations.
-        this.productPrice = "No price information available";
+        this.productPrice = "Price unknown";
         this.productInfo = "";
     }
     @Override
@@ -48,6 +48,7 @@ public class ProductModel {
         return productPrice;
     }
     public void setProductPrice(String productPrice) {
+        productPrice = productPrice.replaceAll("\\–", "00");
         this.productPrice = productPrice;
     }
     public String getProductInfo() {
