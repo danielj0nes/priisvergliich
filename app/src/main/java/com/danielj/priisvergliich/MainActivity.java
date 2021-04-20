@@ -157,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
-        ListView listView = findViewById(R.id.lv_productList);
-        // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -172,17 +170,20 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         menu.findItem(R.id.search).setOnActionExpandListener(searchListener);
+        ListView listView = findViewById(R.id.lv_productList);
+        // Search functionality
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem sv = menu.findItem(R.id.search);
+        sv.expandActionView();
+        searchView.clearFocus();
         searchView.setQueryHint("Search for a product...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 callSearch(query);
                 return true;
             }
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText)){
@@ -192,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             }
-            @RequiresApi(api = Build.VERSION_CODES.O)
             public void callSearch(String query) {
                 List<ProductModel> products = new ArrayList<>();
                 rc.getMigrosProducts(query, resultMigros -> {
