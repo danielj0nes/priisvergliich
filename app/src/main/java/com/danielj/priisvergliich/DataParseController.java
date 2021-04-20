@@ -76,6 +76,7 @@ public class DataParseController {
         List<ProductModel> products = new ArrayList<>();
         Document doc = Jsoup.parse(response);
         Elements scripts = doc.getElementsByTag("script");
+        Elements weights = doc.select("span.productTile__quantity-text");
         for (Element script : scripts) {
             if (script.data().contains("utag_data")) {
                 Pattern pattern = Pattern.compile(".*utag_data = ([^;]*)");
@@ -89,6 +90,7 @@ public class DataParseController {
                         String baseUrl = "https://www.coop.ch/img/produkte/310_310/RGB/";
                         for (int i = 0; i < productNames.length(); i++) {
                             ProductModel product = new ProductModel();
+                            product.setProductInfo(weights.get(i).text());
                             String productUrl = baseUrl + productIds.getString(i) + "_001.jpg?_=1581484027184";
                             product.setProductName(productNames.getString(i));
                             product.setProductPrice(productPrices.getString(i));
