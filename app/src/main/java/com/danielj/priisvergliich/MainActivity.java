@@ -54,17 +54,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     FusedLocationProviderClient fusedLocationProviderClient;
     /*Const variables*/
     int SEARCH_THRESHOLD = 3;
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_comparison:
-                System.out.println("Added!");
-                return true;
-            default:
-                return false;
-        }
-    }
+    List<ProductModel> TEMP_LIST = new ArrayList<>();
+    private int listItemPositionForPopupMenu;
 
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
@@ -147,6 +138,17 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         comparisonMenu.inflate(R.menu.comparison_menu);
         comparisonMenu.show();
     }
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_comparison:
+                System.out.println("Added!");
+                System.out.println(listItemPositionForPopupMenu);
+                return true;
+            default:
+                return false;
+        }
+    }
     class ProductAdapter extends ArrayAdapter<ProductModel> {
         public ProductAdapter(Context context, List<ProductModel> products) {
             super(context, 0, products);
@@ -209,9 +211,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Search for a product...");
         listView.setOnItemClickListener((parent, view, position, id) -> {
+            listItemPositionForPopupMenu = position;
             System.out.println(parent.getAdapter().getItem(position));
             comparisonMenuShow(parent.getAdapter().getView(position, view, parent));
-            System.out.println("Test");
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
