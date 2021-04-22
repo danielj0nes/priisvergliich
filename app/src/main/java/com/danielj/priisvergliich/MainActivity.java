@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,11 +26,15 @@ import android.view.WindowManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -40,14 +45,27 @@ import java.util.List;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
     /*Class instantiations*/
     UserModel userModel = new UserModel();
     DataParseController dpc = new DataParseController();
     DatabaseController dbc = new DatabaseController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
+    /*Const variables*/
     int SEARCH_THRESHOLD = 3;
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_comparison:
+                System.out.println("Added!");
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
@@ -122,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ComparisonActivity.class);
         startActivity(intent);
     }
+    public void comparisonMenuShow(View v) {
+        ContextThemeWrapper ctw = new ContextThemeWrapper(this, R.style.ComparisonMenuTheme);
+        PopupMenu comparisonMenu = new PopupMenu(ctw, v);
+        comparisonMenu.setOnMenuItemClickListener(this);
+        comparisonMenu.inflate(R.menu.comparison_menu);
+        comparisonMenu.show();
+    }
     class ProductAdapter extends ArrayAdapter<ProductModel> {
         public ProductAdapter(Context context, List<ProductModel> products) {
             super(context, 0, products);
@@ -160,10 +185,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
+        inflater.inflate(R.menu.main_menubar, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
+        Button receiptButton = findViewById(R.id.btn_receiptScanner);
+        receiptButton.setVisibility(View.VISIBLE);
         ListView listView = findViewById(R.id.lv_productList);
-        ProgressBar loadingBar = findViewById(R.id.progressBar);
+        ProgressBar loadingBar = findViewById(R.id.pb_progressBar);
         loadingBar.setVisibility(View.GONE);
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
@@ -183,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setQueryHint("Search for a product...");
         listView.setOnItemClickListener((parent, view, position, id) -> {
             System.out.println(parent.getAdapter().getItem(position));
+            comparisonMenuShow(parent.getAdapter().getView(position, view, parent));
             System.out.println("Test");
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -196,7 +224,9 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText)){
                     listView.setVisibility(View.GONE);
+                    receiptButton.setVisibility(View.VISIBLE);
                 } else {
+                    receiptButton.setVisibility(View.GONE);
                     listView.setVisibility(View.VISIBLE);
                 }
                 return true;
