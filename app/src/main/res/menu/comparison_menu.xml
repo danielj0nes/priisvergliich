@@ -6,4 +6,8 @@
         android:popupBackground="@color/white"
         android:title="@string/add_to_comparison_list" />
 
+    <item
+        android:id="@+id/specificSearch"
+        android:popupBackground="@color/white"
+        android:title="@string/specific_search" />
 </menu>

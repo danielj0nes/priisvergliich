@@ -2,4 +2,6 @@
     <string name="app_name">priisvergliich</string>
     <string name="scan_receipt">Scan receipt</string>
     <string name="add_to_comparison_list">Add to comparison list</string>
+    <string name="specific_search">Specific search</string>
+
 </resources>
