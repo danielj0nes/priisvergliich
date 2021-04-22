@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,8 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseController dbc = new DatabaseController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
-
+    int SEARCH_THRESHOLD = 3;
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
@@ -119,14 +118,9 @@ public class MainActivity extends AppCompatActivity {
                     LENGTH_SHORT).show();
         }
     }
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
-                MainActivity.this
-        );
+    public void openActivityComparison() {
+        Intent intent = new Intent(this, ComparisonActivity.class);
+        startActivity(intent);
     }
     class ProductAdapter extends ArrayAdapter<ProductModel> {
         public ProductAdapter(Context context, List<ProductModel> products) {
@@ -153,12 +147,25 @@ public class MainActivity extends AppCompatActivity {
             return convertView;
         }
     }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(
+                MainActivity.this
+        );
+    }
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.pvg_menu0, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
+        ListView listView = findViewById(R.id.lv_productList);
+        ProgressBar loadingBar = findViewById(R.id.progressBar);
+        loadingBar.setVisibility(View.GONE);
+        // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -172,12 +179,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         menu.findItem(R.id.search).setOnActionExpandListener(searchListener);
-        ListView listView = findViewById(R.id.lv_productList);
-        ProgressBar loadingBar = findViewById(R.id.progressBar);
-        loadingBar.setVisibility(View.GONE);
-        // Search functionality
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Search for a product...");
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            System.out.println(parent.getAdapter().getItem(position));
+            System.out.println("Test");
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -201,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     products.addAll(resultMigros);
                     rc.getCoopProducts(query, resultCoop -> {
                         products.addAll(resultCoop);
-                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, dpc.sortRelevance(products, 3));
+                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, dpc.sortRelevance(products, SEARCH_THRESHOLD));
                         MainActivity.this.runOnUiThread(() -> {
                             listView.setAdapter(adapter);
                             loadingBar.setVisibility(View.GONE);
