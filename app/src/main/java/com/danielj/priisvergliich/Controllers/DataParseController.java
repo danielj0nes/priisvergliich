@@ -1,4 +1,6 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Controllers;
+
+import com.danielj.priisvergliich.Models.ProductModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,7 +11,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,18 +73,24 @@ public class DataParseController {
         }
         return products;
     }
+    /*The parseCoopData method is used to parse the data obtained in the request into usable
+    * products of class ProductModel. Since Coop doesn't have public API endpoints, Jsoup is utilised
+    * to parse the HTML data and extract the values.*/
     public List<ProductModel> parseCoopData(String response) {
-        // To do: get weight info
         List<ProductModel> products = new ArrayList<>();
         Document doc = Jsoup.parse(response);
+        // First obtain all of the 'scripts' as product data is stored within variable of script
         Elements scripts = doc.getElementsByTag("script");
         Elements weights = doc.select("span.productTile__quantity-text");
         for (Element script : scripts) {
+            // Find the correct script
             if (script.data().contains("utag_data")) {
+                // Use regex to extract data into a JSON format
                 Pattern pattern = Pattern.compile(".*utag_data = ([^;]*)");
                 Matcher matcher = pattern.matcher(script.data());
                 if (matcher.find()) {
                     try {
+                        // Build the ProductModel classes
                         JSONObject jso = new JSONObject(matcher.group(1));
                         JSONArray productNames = jso.getJSONArray("product_productInfo_productName");
                         JSONArray productPrices = jso.getJSONArray("product_attributes_basePrice");
@@ -164,6 +171,26 @@ public class DataParseController {
                 relevantProducts.addAll(migrosProducts);
             }
             return relevantProducts;
+        }
+    }
+    public String calculateCheapest(List<ProductModel> products) {
+        float migrosTotal = 0;
+        float coopTotal = 0;
+        for (ProductModel p : products) {
+            if (p.getProductOrigin() == "Migros" && p.getProductPrice() != "Price unknown") {
+                migrosTotal = migrosTotal + Float.parseFloat(p.getProductPrice());
+            }
+            else if (p.getProductOrigin() == "Coop" && p.getProductPrice() != "Price unknown") {
+                coopTotal = coopTotal + Float.parseFloat(p.getProductPrice());
+            }
+        }
+        if (migrosTotal < coopTotal) {
+            return "Migros";
+        }
+        else if (coopTotal < migrosTotal) {
+            return "Coop";
+        } else {
+            return "Equal";
         }
     }
 }

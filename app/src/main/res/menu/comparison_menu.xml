@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/addComparison"
+        android:popupBackground="@color/white"
+        android:title="@string/add_to_comparison_list" />
+
+    <item
+        android:id="@+id/specificSearch"
+        android:popupBackground="@color/white"
+        android:title="@string/specific_search" />
+</menu>

@@ -1,7 +1,9 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Models;
+
+import android.graphics.Bitmap;
 
 /*
-* Class model for a product in the app. Standard default get/set method implementations.
+* Class model for a product (i.e. extracted supermarket item) in the app.
 * */
 public class ProductModel {
     private String productName;
@@ -9,7 +11,9 @@ public class ProductModel {
     private String productPrice;
     private String productInfo;
     private String productOrigin;
+    private Bitmap imageBitmap;
 
+    /*Variable instantiation*/
     public ProductModel(String productName, String imageSrc, String productPrice, String productInfo, String productOrigin) {
         this.productName = productName;
         this.imageSrc = imageSrc;
@@ -17,11 +21,13 @@ public class ProductModel {
         this.productInfo = productInfo; // e.g. weight / quantity
         this.productOrigin = productOrigin;
     }
+    /*Empty instantiation*/
     public ProductModel() {
         // Default variable initilisations.
         this.productPrice = "Price unknown";
         this.productInfo = "";
     }
+    /*String representation of the class following convention*/
     @Override
     public String toString() {
         return "ProductModel{" +
@@ -32,6 +38,7 @@ public class ProductModel {
                 ", productOrigin=" + productOrigin +
                 ";";
     }
+    /*Default class method implementations*/
     public String getProductName() {
         return productName;
     }
@@ -62,5 +69,11 @@ public class ProductModel {
     }
     public void setProductOrigin(String productOrigin) {
         this.productOrigin = productOrigin;
+    }
+    public Bitmap getImageAsBitmap() {
+        return imageBitmap;
+    }
+    public void setImageBitmap(Bitmap image) {
+        this.imageBitmap = image;
     }
 }
