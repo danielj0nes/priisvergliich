@@ -36,7 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.danielj.priisvergliich.Controllers.DataParseController;
-import com.danielj.priisvergliich.Controllers.DatabaseController;
+import com.danielj.priisvergliich.Controllers.UserDBController;
 import com.danielj.priisvergliich.Controllers.RequestsController;
 import com.danielj.priisvergliich.Models.ProductModel;
 import com.danielj.priisvergliich.R;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     /*Class instantiations*/
     UserModel userModel = new UserModel();
     DataParseController dpc = new DataParseController();
-    DatabaseController dbc = new DatabaseController(MainActivity.this);
+    UserDBController dbc = new UserDBController(MainActivity.this);
     RequestsController rc = new RequestsController();
     FusedLocationProviderClient fusedLocationProviderClient;
     /*Const variables*/

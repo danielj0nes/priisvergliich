@@ -5,29 +5,24 @@ import android.content.Context;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
 import com.danielj.priisvergliich.Models.ProductModel;
 import com.danielj.priisvergliich.Models.UserModel;
 
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+
 /*This controller is used to handle the primary CRUD database operations.*/
-public class DatabaseController extends SQLiteOpenHelper {
+public class UserDBController extends SQLiteOpenHelper {
 
     public static final String USER_TABLE = "USER_TABLE";
-    public static final String COMPARISON_LIST_TABLE = "COMPARISON_LIST_TABLE";
     public static final String LATITUDE = "LATITUDE";
     public static final String LONGITUDE = "LONGITUDE";
-    public static final String PRODUCT_NAME = "PRODUCT_NAME";
-    public static final String PRODUCT_PRICE = "PRODUCT_PRICE";
-    public static final String PRODUCT_ORIGIN = "PRODUCT_ORIGIN";
-    public static final String PRODUCT_INFO = "PRODUCT_INFO";
-    public static final String PRODUCT_IMAGE = "PRODUCT_IMAGE";
 
-
-
-
-    public DatabaseController(@Nullable Context context) {
+    public UserDBController(@Nullable Context context) {
         super(context, "user.db", null, 1);
     }
     @Override
@@ -38,14 +33,6 @@ public class DatabaseController extends SQLiteOpenHelper {
                     + LATITUDE + " REAL, "
                     + LONGITUDE + " REAL)";
             db.execSQL(createUsers);
-            String createCL = "CREATE TABLE IF NOT EXISTS " + COMPARISON_LIST_TABLE
-                    + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + PRODUCT_NAME + " TEXT, "
-                    + PRODUCT_PRICE + " TEXT, "
-                    + PRODUCT_ORIGIN + " TEXT, "
-                    + PRODUCT_INFO + " TEXT, "
-                    + PRODUCT_IMAGE + " BLOB)";
-            db.execSQL(createCL);
         } catch (Exception e) {
             // This really shouldn't occur unless the SQL queries are fundamentally incorrect
             System.out.println(e.getMessage());
@@ -74,17 +61,5 @@ public class DatabaseController extends SQLiteOpenHelper {
             final long update = db.update(USER_TABLE, cv, "id = ?", new String[]{"0"});
             return update != -1;
         }
-    }
-    public boolean insertComparisonList(ProductModel productModel) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put(PRODUCT_NAME, productModel.getProductName());
-        cv.put(PRODUCT_PRICE, productModel.getProductPrice());
-        cv.put(PRODUCT_ORIGIN, productModel.getProductOrigin());
-        cv.put(PRODUCT_INFO, productModel.getProductInfo());
-
-
-
-        return true;
     }
 }

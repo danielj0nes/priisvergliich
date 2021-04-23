@@ -38,7 +38,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="200dp"
         android:backgroundTint="@color/button_colour"
-        android:text="@string/saved_comparisons"
+        android:text="@string/saved_products"
         android:visibility="visible"
         tools:visibility="visible"
         />
