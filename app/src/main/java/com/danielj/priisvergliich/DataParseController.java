@@ -172,4 +172,24 @@ public class DataParseController {
             return relevantProducts;
         }
     }
+    public String calculateCheapest(List<ProductModel> products) {
+        float migrosTotal = 0;
+        float coopTotal = 0;
+        for (ProductModel p : products) {
+            if (p.getProductOrigin() == "Migros" && p.getProductPrice() != "Price unknown") {
+                migrosTotal = migrosTotal + Float.parseFloat(p.getProductPrice());
+            }
+            else if (p.getProductOrigin() == "Coop" && p.getProductPrice() != "Price unknown") {
+                coopTotal = coopTotal + Float.parseFloat(p.getProductPrice());
+            }
+        }
+        if (migrosTotal < coopTotal) {
+            return "Migros";
+        }
+        else if (coopTotal < migrosTotal) {
+            return "Coop";
+        } else {
+            return "Equal";
+        }
+    }
 }

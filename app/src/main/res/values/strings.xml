@@ -3,7 +3,9 @@
     <string name="scan_receipt">Scan receipt</string>
     <string name="add_to_comparison_list">Add to comparison list</string>
     <string name="specific_search">Specific search</string>
-    <string name="to_comparison_list">Go to comparison list</string>
+    <string name="to_comparison_list">To comparison list</string>
     <string name="saved_comparisons">Saved comparison lists</string>
+    <string name="number_of_items">Number of items:</string>
+    <string name="cheapest_shop">Cheapest shop:</string>
 
 </resources>

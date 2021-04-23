@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     public static List<ProductModel> TEMP_PRODUCT_LIST = new ArrayList<>();
     ProductModel TEMP_PRODUCT = new ProductModel();
     /*Helper class to extract bitmaps from image URLs in order to display them in the app*/
-    private class LoadImage extends AsyncTask<String, Void, Bitmap> {
+    private static class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
             this.imageView = imageView;
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                                 MainActivity.this,
                                 longitude + " " + latitude + " " + t,
                                 LENGTH_SHORT).show();
-                        System.out.println("Success");
                     } else {
                         Toast.makeText(MainActivity.this,
                                 "Could not get location, please try again",
@@ -171,9 +170,17 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 TEMP_PRODUCT_LIST.add(TEMP_PRODUCT);
                 System.out.println(TEMP_PRODUCT_LIST);
                 findViewById(R.id.btn_goToComparisonList).setVisibility(View.VISIBLE);
+                Toast.makeText(
+                        MainActivity.this,
+                        "Product successfully added to unsaved comparison list",
+                        LENGTH_SHORT).show();
                 return true;
             case R.id.specificSearch:
                 callSearch(TEMP_PRODUCT.getProductName() + " " + TEMP_PRODUCT.getProductInfo());
+                Toast.makeText(
+                        MainActivity.this,
+                        "Searching...",
+                        LENGTH_SHORT).show();
             default:
                 return false;
         }
@@ -181,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     /*Adapter class that translates an item of class ProductModel into an item of the list view
     * This is used each time a search is made to display the correctly search items returned
     * from the parsed request.*/
-    class ProductAdapter extends ArrayAdapter<ProductModel> {
+    static class ProductAdapter extends ArrayAdapter<ProductModel> {
         public ProductAdapter(Context context, List<ProductModel> products) {
             super(context, 0, products);
         }

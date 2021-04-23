@@ -10,4 +10,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#80000000</color>
+    <color name="swiss_red">#FF0000</color>
+
 </resources>
