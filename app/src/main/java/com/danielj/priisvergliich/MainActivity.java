@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -108,12 +110,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     if (location != null) {
                         userModel.setLatitude(location.getLatitude());
                         userModel.setLongitude(location.getLongitude());
-                        boolean t = dbc.modifyUser(userModel);
+                        boolean modified = dbc.modifyUser(userModel);
                         double longitude = userModel.getLongitude();
                         double latitude = userModel.getLatitude();
                         Toast.makeText(
                                 MainActivity.this,
-                                longitude + " " + latitude + " " + t,
+                                "Location enabled.\nLatitude: " + latitude + " Longitude: " + longitude
+                                        + "\nData saved to database: " + modified,
                                 LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(MainActivity.this,
@@ -133,6 +136,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         Intent intent = new Intent(this, ComparisonActivity.class);
         startActivity(intent);
     }
+    public void openSavedComparisons() {
+        Intent intent = new Intent(this, SavedComparisonsActivity.class);
+        startActivity(intent);
+    }
+
     /*Given a view, will display the popout menu for a given product in the product list*/
     public void comparisonMenuShow(View v) {
         ContextThemeWrapper ctw = new ContextThemeWrapper(this, R.style.ComparisonMenuTheme);
@@ -182,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                         MainActivity.this,
                         "Searching...",
                         LENGTH_SHORT).show();
+                return true;
             default:
                 return false;
         }
@@ -200,13 +209,26 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.row, parent, false);
             }
+            ImageView ivImageSrc = convertView.findViewById(R.id.iv_productImage);
+            if (product.getImageAsBitmap() != null) {
+                // If we already have the bitmap, we can save time by rendering this rather than converting
+                ivImageSrc.setImageBitmap(product.getImageAsBitmap());
+            } else {
+                // Otherwise create bitmaps from URLs asynchronously
+                LoadImage loadImage = new LoadImage(ivImageSrc);
+                try {
+                    Bitmap result = loadImage.execute(product.getImageSrc()).get();
+                    product.setImageBitmap(result);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             TextView tvProductName = convertView.findViewById(R.id.tv_productName);
             TextView tvProductPrice = convertView.findViewById(R.id.tv_productPrice);
             TextView tvProductInfo = convertView.findViewById(R.id.tv_productInfo);
             TextView tvProductOrigin = convertView.findViewById(R.id.tv_productOrigin);
-            ImageView ivImageSrc = convertView.findViewById(R.id.iv_productImage);
-            LoadImage loadImage = new LoadImage(ivImageSrc);
-            loadImage.execute(product.getImageSrc());
             tvProductName.setText(product.getProductName());
             tvProductPrice.setText(product.getProductPrice());
             tvProductInfo.setText(product.getProductInfo());
@@ -225,6 +247,23 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 MainActivity.this
         );
     }
+    Boolean storeFinder(String store, double latitude, double longitude) {
+        String url = "https://www.google.com/maps/search/";
+        switch (store) {
+            case "Migros":
+                url = url + "migros/@";
+                break;
+            case "Coop":
+                url = url + "coop/@";
+                break;
+            default:
+                return false;
+        }
+        url = url + latitude + "," + longitude + ",13z/data=!3m1!4b1";
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
+        return true;
+    }
     /*Initialisations, method calls, and listeners for the majority of the core functionality.*/
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -233,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         inflater.inflate(R.menu.main_menubar, menu); // Toolbar
         // UI element initialisations
         MenuItem locationButton = menu.findItem(R.id.cur_location);
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
         Button receiptButton = findViewById(R.id.btn_receiptScanner);
         Button savedComparisonsButton = findViewById(R.id.btn_savedComparisons);
         Button migrosFinderButton = findViewById(R.id.btn_migrosLocator);
@@ -240,23 +280,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         ListView listView = findViewById(R.id.lv_productList);
         ProgressBar loadingBar = findViewById(R.id.pb_progressBar);
         loadingBar.setVisibility(View.GONE);
-        // Nearest store finder functionality
-        migrosFinderButton.setOnClickListener(v -> {
-            double longitude = userModel.getLongitude();
-            double latitude = userModel.getLatitude();
-            String url = "https://www.google.com/maps/search/migros/@"
-                    + longitude + "," + latitude + ",13z/data=!3m1!4b1";
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(browserIntent);
-        });
-        coopFinderButton.setOnClickListener(v -> {
-            double longitude = userModel.getLongitude();
-            double latitude = userModel.getLatitude();
-            String url = "https://www.google.com/maps/search/coop/@"
-                    + longitude + "," + latitude + ",13z/data=!3m1!4b1";
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(browserIntent);
-        });
         // Comparison UI functionality
         Button comparisonButton = findViewById(R.id.btn_goToComparisonList);
         comparisonButton.setVisibility(View.GONE);
@@ -271,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 locationButton.setVisible(true);
+                // Once the search is cleared, clear the product list and hide the compare button
+                comparisonButton.setVisibility(View.GONE);
+                TEMP_PRODUCT_LIST = new ArrayList<>();
                 return true;
             }
         };
@@ -293,7 +319,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if (TextUtils.isEmpty(newText)){
                     listView.setVisibility(View.GONE);
                     receiptButton.setVisibility(View.VISIBLE);
-                    comparisonButton.setVisibility(View.GONE);
                     savedComparisonsButton.setVisibility(View.VISIBLE);
                     migrosFinderButton.setVisibility(View.VISIBLE);
                     coopFinderButton.setVisibility(View.VISIBLE);
@@ -332,6 +357,21 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             return true;
         };
         menu.findItem(R.id.cur_location).setOnMenuItemClickListener(locationBtnListener);
+        // Saved comparison lists
+        savedComparisonsButton.setOnClickListener(v -> {
+            openSavedComparisons();
+        });
+        // Nearest store finder functionality
+        migrosFinderButton.setOnClickListener(v -> {
+            double latitude = userModel.getLatitude();
+            double longitude = userModel.getLongitude();
+            storeFinder("Migros", latitude, longitude);
+        });
+        coopFinderButton.setOnClickListener(v -> {
+            double latitude = userModel.getLatitude();
+            double longitude = userModel.getLongitude();
+            storeFinder("Coop", latitude, longitude);
+        });
         return true;
     }
 }

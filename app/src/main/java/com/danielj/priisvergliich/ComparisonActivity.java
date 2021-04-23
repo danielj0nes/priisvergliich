@@ -1,24 +1,14 @@
 package com.danielj.priisvergliich;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.r0adkll.slidr.Slidr;
 
-import java.util.List;
 
 
 public class ComparisonActivity extends AppCompatActivity {

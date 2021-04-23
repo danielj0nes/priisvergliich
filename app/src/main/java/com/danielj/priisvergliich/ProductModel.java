@@ -1,5 +1,7 @@
 package com.danielj.priisvergliich;
 
+import android.graphics.Bitmap;
+
 /*
 * Class model for a product (i.e. extracted supermarket item) in the app.
 * */
@@ -9,6 +11,7 @@ public class ProductModel {
     private String productPrice;
     private String productInfo;
     private String productOrigin;
+    private Bitmap imageBitmap;
 
     /*Variable instantiation*/
     public ProductModel(String productName, String imageSrc, String productPrice, String productInfo, String productOrigin) {
@@ -66,5 +69,11 @@ public class ProductModel {
     }
     public void setProductOrigin(String productOrigin) {
         this.productOrigin = productOrigin;
+    }
+    public Bitmap getImageAsBitmap() {
+        return imageBitmap;
+    }
+    public void setImageBitmap(Bitmap image) {
+        this.imageBitmap = image;
     }
 }
