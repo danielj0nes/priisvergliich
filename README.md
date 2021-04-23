@@ -2,9 +2,9 @@
 
 Priisvergliich ("Price comparison" in English) is an app that allows the user to search and compare items across Swiss supermarkets. The app is inspired from the popular (but unfortunately now no longer) mysupermarket.co.uk. 
 
+**Video demonstration** https://drive.google.com/file/d/13W1oRErP_NCPqSSyyjIpP5vX8ggdKM3B/view?usp=sharing
 
-![Priisvergliich](https://i.imgur.com/m8NVIP7.png)
-
+<img src="https://i.imgur.com/m8NVIP7.png" width="200" height="200" />
 
 The current list of features are:
 
