@@ -77,6 +77,7 @@ public class ProductDBController extends SQLiteOpenHelper {
         }
         return true;
     }
+    /*Simple query to return all products. Includes image byte arrays which are then decoded.*/
     public List<ProductModel> getAllSavedProducts(){
         SQLiteDatabase db = this.getWritableDatabase();
         List<ProductModel> products = new ArrayList<>();
