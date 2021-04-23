@@ -4,6 +4,8 @@ Priisvergliich ("Price comparison" in English) is an app that allows the user to
 
 **Video demonstration** https://drive.google.com/file/d/13W1oRErP_NCPqSSyyjIpP5vX8ggdKM3B/view?usp=sharing
 
+**YouTube link** https://youtu.be/uRpa_rX2vzw
+
 <img src="https://i.imgur.com/m8NVIP7.png" width="200" height="200" />
 
 The current list of features are:
