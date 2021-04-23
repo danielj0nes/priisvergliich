@@ -1,7 +1,7 @@
 package com.danielj.priisvergliich;
 
 /*
-* Class model for a product in the app. Standard default get/set method implementations.
+* Class model for a product (i.e. extracted supermarket item) in the app.
 * */
 public class ProductModel {
     private String productName;
@@ -10,6 +10,7 @@ public class ProductModel {
     private String productInfo;
     private String productOrigin;
 
+    /*Variable instantiation*/
     public ProductModel(String productName, String imageSrc, String productPrice, String productInfo, String productOrigin) {
         this.productName = productName;
         this.imageSrc = imageSrc;
@@ -17,11 +18,13 @@ public class ProductModel {
         this.productInfo = productInfo; // e.g. weight / quantity
         this.productOrigin = productOrigin;
     }
+    /*Empty instantiation*/
     public ProductModel() {
         // Default variable initilisations.
         this.productPrice = "Price unknown";
         this.productInfo = "";
     }
+    /*String representation of the class following convention*/
     @Override
     public String toString() {
         return "ProductModel{" +
@@ -32,6 +35,7 @@ public class ProductModel {
                 ", productOrigin=" + productOrigin +
                 ";";
     }
+    /*Default class method implementations*/
     public String getProductName() {
         return productName;
     }

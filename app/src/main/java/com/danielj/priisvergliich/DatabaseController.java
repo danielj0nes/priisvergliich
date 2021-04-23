@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+/*This controller is used to handle the primary CRUD database operations.*/
 public class DatabaseController extends SQLiteOpenHelper {
 
     public static final String USER_TABLE = "USER_TABLE";
@@ -28,7 +29,10 @@ public class DatabaseController extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
-    public boolean modify(UserModel userModel) {
+    /*The modifyUser function is used to either insert a completely new user with location data
+    * into the model or to update existing location data. At the moment only location information is
+    * related to the user in this app, this is likely to change and could be easily modified to fit.*/
+    public boolean modifyUser(UserModel userModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         // Working with cv for convenience
         ContentValues cv = new ContentValues();

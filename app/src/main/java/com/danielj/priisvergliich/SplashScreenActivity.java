@@ -9,6 +9,7 @@ import android.view.WindowManager;
 
 import com.danielj.priisvergliich.R;
 
+/*Class that simply displays the app splash screen as an activity upon app load*/
 public class SplashScreenActivity extends AppCompatActivity {
 
     @Override

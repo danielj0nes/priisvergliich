@@ -33,11 +33,9 @@ import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.r0adkll.slidr.Slidr;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     int SEARCH_THRESHOLD = 3;
     List<ProductModel> TEMP_LIST = new ArrayList<>();
     ProductModel TEMP_PRODUCT = new ProductModel();
-
+    /*Helper class to extract bitmaps from image URLs in order to display them in the app*/
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
@@ -80,10 +78,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             imageView.setImageBitmap(bitmap);
         }
     }
+    /*Customised permission handling functionality - particularly needed for precise location*/
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // Permissions handling
         if (requestCode == 100 && grantResults.length > 0 && (grantResults[0] + grantResults[1]
         == PackageManager.PERMISSION_GRANTED)) {
             getCurrentLocation();
@@ -91,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             Toast.makeText(MainActivity.this, "Permission denied", LENGTH_SHORT).show();
         }
     }
+    /*Helper function to get and update the current user location (uses lat/long values).
+    * This is called on the click of the location button on the main menu bar.*/
     @RequiresApi(api = Build.VERSION_CODES.P)
     private void getCurrentLocation() {
         LocationManager lm = (LocationManager) getSystemService(
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     if (location != null) {
                         userModel.setLatitude(location.getLatitude());
                         userModel.setLongitude(location.getLongitude());
-                        boolean t = dbc.modify(userModel);
+                        boolean t = dbc.modifyUser(userModel);
                         double longitude = userModel.getLongitude();
                         double latitude = userModel.getLatitude();
                         Toast.makeText(
@@ -128,10 +128,12 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     LENGTH_SHORT).show();
         }
     }
+    /*Helper function to transition to the comparison list activity*/
     public void openActivityComparison() {
         Intent intent = new Intent(this, ComparisonActivity.class);
         startActivity(intent);
     }
+    /*Given a view, will display the popout menu for a given product in the product list*/
     public void comparisonMenuShow(View v) {
         ContextThemeWrapper ctw = new ContextThemeWrapper(this, R.style.ComparisonMenuTheme);
         PopupMenu comparisonMenu = new PopupMenu(ctw, v);
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         comparisonMenu.inflate(R.menu.comparison_menu);
         comparisonMenu.show();
     }
+    /*Simple listener for when a menu item in the comparison popout is selected*/
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -150,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 return false;
         }
     }
+    /*Adapter class that translates an item of class ProductModel into an item of the list view
+    * This is used each time a search is made to display the correctly search items returned
+    * from the parsed request.*/
     class ProductAdapter extends ArrayAdapter<ProductModel> {
         public ProductAdapter(Context context, List<ProductModel> products) {
             super(context, 0, products);
@@ -175,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             return convertView;
         }
     }
+    /*Standard onCreate method, the fused location provider client is set and initialised here
+    * with the main activity thread.*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,11 +192,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 MainActivity.this
         );
     }
+    /*Initialisations, method calls, and listeners for the majority of the core functionality.*/
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menubar, menu); // Toolbar
+        // UI element initialisations
         MenuItem locationButton = menu.findItem(R.id.cur_location);
         Button receiptButton = findViewById(R.id.btn_receiptScanner);
         Button savedComparisonsButton = findViewById(R.id.btn_savedComparisons);
@@ -241,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 }
                 return true;
             }
+            /*Helper function that utilises functions from the Requests Controller in order to
+            * obtain and display results. As the name suggests, this is called on search submit.*/
             public void callSearch(String query) {
                 List<ProductModel> products = new ArrayList<>();
                 loadingBar.setVisibility(View.VISIBLE);
@@ -257,7 +269,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 });
             }
         });
-        // Location functionality
+        /*Location button listener - ensures that the right permissions are enabled and handles
+        * the cases where they are not. If permissions are granted, the getCurrentLocation() method
+        * is called to handle the additional functionality.*/
         MenuItem.OnMenuItemClickListener locationBtnListener = item -> {
             if (ActivityCompat.checkSelfPermission(MainActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED

@@ -72,18 +72,24 @@ public class DataParseController {
         }
         return products;
     }
+    /*The parseCoopData method is used to parse the data obtained in the request into usable
+    * products of class ProductModel. Since Coop doesn't have public API endpoints, Jsoup is utilised
+    * to parse the HTML data and extract the values.*/
     public List<ProductModel> parseCoopData(String response) {
-        // To do: get weight info
         List<ProductModel> products = new ArrayList<>();
         Document doc = Jsoup.parse(response);
+        // First obtain all of the 'scripts' as product data is stored within variable of script
         Elements scripts = doc.getElementsByTag("script");
         Elements weights = doc.select("span.productTile__quantity-text");
         for (Element script : scripts) {
+            // Find the correct script
             if (script.data().contains("utag_data")) {
+                // Use regex to extract data into a JSON format
                 Pattern pattern = Pattern.compile(".*utag_data = ([^;]*)");
                 Matcher matcher = pattern.matcher(script.data());
                 if (matcher.find()) {
                     try {
+                        // Build the ProductModel classes
                         JSONObject jso = new JSONObject(matcher.group(1));
                         JSONArray productNames = jso.getJSONArray("product_productInfo_productName");
                         JSONArray productPrices = jso.getJSONArray("product_attributes_basePrice");

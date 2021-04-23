@@ -99,6 +99,8 @@ public class RequestsController {
             });
         });
     }
+    /*Since coop doesn't utilise a public API endpoint, a direct request is made to receive
+    * HTML data that then has to be parsed.*/
     public void getCoopProducts(String query, ProductCallback callback) {
         query = query.replaceAll("\\s", "%20");
         String url = "https://www.coop.ch/de/search/?text="+query;
