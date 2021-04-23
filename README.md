@@ -11,17 +11,15 @@ The current list of features are:
 * Product comparison - query and find out which Swiss supermarkets sell the item/s you want for the cheapest price
 
 
-![Comparison](https://i.imgur.com/UtVo1h7.png)
-
+<img src="https://i.imgur.com/UtVo1h7.png" width="400" height="600" />
 
 
 * Optimal shopping algorithm - based on an input of items, find out which shop you should go to in order to save the most money
 
 
-![Optimal_shopping_algorithm](https://i.imgur.com/0dHBYYN.png)
-
+<img src="https://i.imgur.com/0dHBYYN.png" width="400" height="600" />
 
 
 * Location - find nearest shops and factor this (and different information) in to the calculations.
 
-![Location](https://i.imgur.com/aw8iYVj.png)
+<img src="https://i.imgur.com/aw8iYVj.png" width="400" height="600" />
