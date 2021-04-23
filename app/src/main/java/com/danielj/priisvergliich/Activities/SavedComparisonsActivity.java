@@ -25,9 +25,8 @@ import java.util.concurrent.ExecutionException;
 
 public class SavedComparisonsActivity extends AppCompatActivity {
     ProductDBController dbc = new ProductDBController(this);
-    /*Adapter class that translates an item of class ProductModel into an item of the list view
-     * This is used each time a search is made to display the correctly search items returned
-     * from the parsed request.*/
+    /*Adapter class that translates an item of class ProductModel into an item of the saved item
+     * list view.*/
     static class SavedItemAdapter extends ArrayAdapter<ProductModel> {
         public SavedItemAdapter(Context context, List<ProductModel> products) {
             super(context, 0, products);
@@ -57,9 +56,11 @@ public class SavedComparisonsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_comparisons);
         ListView listView = findViewById(R.id.lv_savedItems);
+        // Configure custom adapter for saved products
         SavedItemAdapter adapter = new SavedItemAdapter(this,
                 dbc.getAllSavedProducts());
         listView.setAdapter(adapter);
+        // Attach slider functionality
         Slidr.attach(this);
     }
 }

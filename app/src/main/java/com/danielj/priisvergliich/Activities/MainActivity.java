@@ -377,6 +377,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             double longitude = userModel.getLongitude();
             storeFinder("Coop", latitude, longitude);
         });
+        // Receipt scanner functionality
+        receiptButton.setOnClickListener(v -> {
+           //
+        });
         return true;
     }
 }

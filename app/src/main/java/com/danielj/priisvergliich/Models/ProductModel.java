@@ -36,7 +36,7 @@ public class ProductModel {
                 ", productPrice=" + productPrice +
                 ", productInfo=" + productInfo +
                 ", productOrigin=" + productOrigin +
-                ";";
+                "};";
     }
     /*Default class method implementations*/
     public String getProductName() {
