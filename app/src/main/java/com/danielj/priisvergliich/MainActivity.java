@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     public static List<ProductModel> TEMP_PRODUCT_LIST = new ArrayList<>();
     ProductModel TEMP_PRODUCT = new ProductModel();
     /*Helper class to extract bitmaps from image URLs in order to display them in the app*/
-    private static class LoadImage extends AsyncTask<String, Void, Bitmap> {
+    static class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
         public LoadImage (ImageView imageView) {
             this.imageView = imageView;
@@ -234,9 +235,28 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         MenuItem locationButton = menu.findItem(R.id.cur_location);
         Button receiptButton = findViewById(R.id.btn_receiptScanner);
         Button savedComparisonsButton = findViewById(R.id.btn_savedComparisons);
+        Button migrosFinderButton = findViewById(R.id.btn_migrosLocator);
+        Button coopFinderButton = findViewById(R.id.btn_coopLocator);
         ListView listView = findViewById(R.id.lv_productList);
         ProgressBar loadingBar = findViewById(R.id.pb_progressBar);
         loadingBar.setVisibility(View.GONE);
+        // Nearest store finder functionality
+        migrosFinderButton.setOnClickListener(v -> {
+            double longitude = userModel.getLongitude();
+            double latitude = userModel.getLatitude();
+            String url = "https://www.google.com/maps/search/migros/@"
+                    + longitude + "," + latitude + ",13z/data=!3m1!4b1";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        });
+        coopFinderButton.setOnClickListener(v -> {
+            double longitude = userModel.getLongitude();
+            double latitude = userModel.getLatitude();
+            String url = "https://www.google.com/maps/search/coop/@"
+                    + longitude + "," + latitude + ",13z/data=!3m1!4b1";
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        });
         // Comparison UI functionality
         Button comparisonButton = findViewById(R.id.btn_goToComparisonList);
         comparisonButton.setVisibility(View.GONE);
@@ -275,11 +295,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     receiptButton.setVisibility(View.VISIBLE);
                     comparisonButton.setVisibility(View.GONE);
                     savedComparisonsButton.setVisibility(View.VISIBLE);
+                    migrosFinderButton.setVisibility(View.VISIBLE);
+                    coopFinderButton.setVisibility(View.VISIBLE);
                 } else {
                     listView.setVisibility(View.VISIBLE);
                     receiptButton.setVisibility(View.GONE);
                     savedComparisonsButton.setVisibility(View.GONE);
-
+                    migrosFinderButton.setVisibility(View.GONE);
+                    coopFinderButton.setVisibility(View.GONE);
                 }
                 return true;
             }
