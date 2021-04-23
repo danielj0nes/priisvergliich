@@ -8,14 +8,28 @@
 
     <Button
         android:id="@+id/btn_receiptScanner"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="#A31414"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="90dp"
+        android:backgroundTint="@color/button_colour"
         android:text="@string/scan_receipt"
         android:visibility="visible"
-        tools:visibility="visible" />
+        tools:visibility="visible"
+        />
+    <Button
+        android:id="@+id/btn_savedComparisons"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="200dp"
+        android:backgroundTint="@color/button_colour"
+        android:text="@string/saved_comparisons"
+        android:visibility="visible"
+        tools:visibility="visible"
+        />
 
     <ProgressBar
         android:id="@+id/pb_progressBar"
@@ -30,7 +44,20 @@
     <ListView
         android:id="@+id/lv_productList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="600dp"
+        />
+
+    <Button
+        android:id="@+id/btn_goToComparisonList"
+        android:backgroundTint="@color/button_colour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:text="@string/to_comparison_list"
+        android:visibility="visible"
+        tools:visibility="visible"
         />
 
 </RelativeLayout>

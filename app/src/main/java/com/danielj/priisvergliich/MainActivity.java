@@ -37,6 +37,7 @@ import android.widget.ToggleButton;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.r0adkll.slidr.Slidr;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     /*Const variables*/
     int SEARCH_THRESHOLD = 3;
     List<ProductModel> TEMP_LIST = new ArrayList<>();
-    private int listItemPositionForPopupMenu;
+    ProductModel TEMP_PRODUCT = new ProductModel();
 
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
         ImageView imageView;
@@ -142,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_comparison:
-                System.out.println("Added!");
-                System.out.println(listItemPositionForPopupMenu);
+                System.out.println(TEMP_PRODUCT);
+                findViewById(R.id.btn_goToComparisonList).setVisibility(View.VISIBLE);
                 return true;
             default:
                 return false;
@@ -190,10 +191,14 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         inflater.inflate(R.menu.main_menubar, menu); // Toolbar
         MenuItem locationButton = menu.findItem(R.id.cur_location);
         Button receiptButton = findViewById(R.id.btn_receiptScanner);
-        receiptButton.setVisibility(View.VISIBLE);
+        Button savedComparisonsButton = findViewById(R.id.btn_savedComparisons);
         ListView listView = findViewById(R.id.lv_productList);
         ProgressBar loadingBar = findViewById(R.id.pb_progressBar);
         loadingBar.setVisibility(View.GONE);
+        // Comparison UI functionality
+        Button comparisonButton = findViewById(R.id.btn_goToComparisonList);
+        comparisonButton.setVisibility(View.GONE);
+        comparisonButton.setOnClickListener(v -> openActivityComparison());
         // Search functionality
         MenuItem.OnActionExpandListener searchListener = new MenuItem.OnActionExpandListener() {
             @Override
@@ -211,8 +216,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Search for a product...");
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            listItemPositionForPopupMenu = position;
-            System.out.println(parent.getAdapter().getItem(position));
+            TEMP_PRODUCT = (ProductModel) parent.getAdapter().getItem(position);
             comparisonMenuShow(parent.getAdapter().getView(position, view, parent));
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -227,9 +231,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if (TextUtils.isEmpty(newText)){
                     listView.setVisibility(View.GONE);
                     receiptButton.setVisibility(View.VISIBLE);
+                    comparisonButton.setVisibility(View.GONE);
+                    savedComparisonsButton.setVisibility(View.VISIBLE);
                 } else {
-                    receiptButton.setVisibility(View.GONE);
                     listView.setVisibility(View.VISIBLE);
+                    receiptButton.setVisibility(View.GONE);
+                    savedComparisonsButton.setVisibility(View.GONE);
+
                 }
                 return true;
             }
