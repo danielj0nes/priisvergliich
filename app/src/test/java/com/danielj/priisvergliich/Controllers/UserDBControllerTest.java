@@ -22,7 +22,5 @@ public class UserDBControllerTest extends TestCase {
         user.setLatitude(-40.128);
         check = dbc.modifyUser(user);
         assertTrue(check == true);
-
-
     }
 }
