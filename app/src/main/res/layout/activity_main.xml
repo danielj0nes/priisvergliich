@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_bg"
-    tools:context="com.danielj.priisvergliich.MainActivity">
+    tools:context="com.danielj.priisvergliich.Activities.MainActivity">
 
     <Button
         android:id="@+id/btn_coopLocator"

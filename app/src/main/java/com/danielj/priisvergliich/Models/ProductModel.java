@@ -1,4 +1,4 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Models;
 
 import android.graphics.Bitmap;
 

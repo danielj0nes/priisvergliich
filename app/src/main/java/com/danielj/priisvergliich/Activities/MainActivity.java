@@ -1,4 +1,4 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -36,6 +35,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.danielj.priisvergliich.Controllers.DataParseController;
+import com.danielj.priisvergliich.Controllers.DatabaseController;
+import com.danielj.priisvergliich.Controllers.RequestsController;
+import com.danielj.priisvergliich.Models.ProductModel;
+import com.danielj.priisvergliich.R;
+import com.danielj.priisvergliich.Models.UserModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -136,11 +141,11 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         Intent intent = new Intent(this, ComparisonActivity.class);
         startActivity(intent);
     }
+    /*Helper function to transition to the saved comparisons list activity*/
     public void openSavedComparisons() {
         Intent intent = new Intent(this, SavedComparisonsActivity.class);
         startActivity(intent);
     }
-
     /*Given a view, will display the popout menu for a given product in the product list*/
     public void comparisonMenuShow(View v) {
         ContextThemeWrapper ctw = new ContextThemeWrapper(this, R.style.ComparisonMenuTheme);
@@ -177,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         switch (item.getItemId()) {
             case R.id.addComparison:
                 TEMP_PRODUCT_LIST.add(TEMP_PRODUCT);
-                System.out.println(TEMP_PRODUCT_LIST);
                 findViewById(R.id.btn_goToComparisonList).setVisibility(View.VISIBLE);
                 Toast.makeText(
                         MainActivity.this,
@@ -247,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 MainActivity.this
         );
     }
+    /*Simple helper function to build store locator URL and then access it via intents*/
     Boolean storeFinder(String store, double latitude, double longitude) {
         String url = "https://www.google.com/maps/search/";
         switch (store) {

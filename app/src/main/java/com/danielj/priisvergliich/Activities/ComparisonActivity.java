@@ -1,4 +1,4 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Activities;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.danielj.priisvergliich.Activities.MainActivity;
+import com.danielj.priisvergliich.Controllers.DataParseController;
+import com.danielj.priisvergliich.R;
 import com.r0adkll.slidr.Slidr;
 
 

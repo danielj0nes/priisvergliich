@@ -14,12 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.priisvergliich.SliderActivityTheme">
-        <activity android:name=".SavedComparisonsActivity"></activity>
+        <activity android:name=".Activities.SavedComparisonsActivity"></activity>
         <activity
-            android:name=".ComparisonActivity"
+            android:name=".Activities.ComparisonActivity"
             android:theme="@style/Theme.priisvergliich.SliderActivityTheme"></activity>
         <activity
-            android:name=".SplashScreenActivity"
+            android:name=".Activities.SplashScreenActivity"
             android:theme="@style/SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".Activities.MainActivity"></activity>
     </application>
 
 </manifest>

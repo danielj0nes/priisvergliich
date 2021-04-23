@@ -1,25 +1,15 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Controllers;
 
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.danielj.priisvergliich.Models.ProductModel;
+
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.DataNode;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;

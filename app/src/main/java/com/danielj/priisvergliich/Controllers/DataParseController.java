@@ -1,4 +1,6 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Controllers;
+
+import com.danielj.priisvergliich.Models.ProductModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,7 +11,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

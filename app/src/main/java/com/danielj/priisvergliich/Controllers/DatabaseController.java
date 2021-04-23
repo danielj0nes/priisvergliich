@@ -1,13 +1,15 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Controllers;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+
+import com.danielj.priisvergliich.Models.ProductModel;
+import com.danielj.priisvergliich.Models.UserModel;
 
 /*This controller is used to handle the primary CRUD database operations.*/
 public class DatabaseController extends SQLiteOpenHelper {

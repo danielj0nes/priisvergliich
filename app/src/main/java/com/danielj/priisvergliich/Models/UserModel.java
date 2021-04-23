@@ -1,4 +1,4 @@
-package com.danielj.priisvergliich;
+package com.danielj.priisvergliich.Models;
 
 /*
 Class model for the 'User' of the app. Realistically only the lat/long values are stored, but this
