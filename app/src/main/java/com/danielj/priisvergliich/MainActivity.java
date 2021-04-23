@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     FusedLocationProviderClient fusedLocationProviderClient;
     /*Const variables*/
     int SEARCH_THRESHOLD = 3;
-    List<ProductModel> TEMP_LIST = new ArrayList<>();
+    public static List<ProductModel> TEMP_PRODUCT_LIST = new ArrayList<>();
     ProductModel TEMP_PRODUCT = new ProductModel();
     /*Helper class to extract bitmaps from image URLs in order to display them in the app*/
     private class LoadImage extends AsyncTask<String, Void, Bitmap> {
@@ -141,14 +141,39 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         comparisonMenu.inflate(R.menu.comparison_menu);
         comparisonMenu.show();
     }
+    /*Helper function that utilises functions from the Requests Controller in order to
+     * obtain and display results. As the name suggests, this is called on search submit.*/
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void callSearch(String query) {
+        List<ProductModel> products = new ArrayList<>();
+        ProgressBar loadingBar = findViewById(R.id.pb_progressBar);
+        loadingBar.setVisibility(View.VISIBLE);
+        rc.getMigrosProducts(query, resultMigros -> {
+            products.addAll(resultMigros);
+            rc.getCoopProducts(query, resultCoop -> {
+                products.addAll(resultCoop);
+                ProductAdapter adapter = new ProductAdapter(MainActivity.this,
+                        dpc.sortRelevance(products, SEARCH_THRESHOLD));
+                MainActivity.this.runOnUiThread(() -> {
+                    ListView listView = findViewById(R.id.lv_productList);
+                    listView.setAdapter(adapter);
+                    loadingBar.setVisibility(View.GONE);
+                });
+            });
+        });
+    }
     /*Simple listener for when a menu item in the comparison popout is selected*/
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.add_comparison:
-                System.out.println(TEMP_PRODUCT);
+            case R.id.addComparison:
+                TEMP_PRODUCT_LIST.add(TEMP_PRODUCT);
+                System.out.println(TEMP_PRODUCT_LIST);
                 findViewById(R.id.btn_goToComparisonList).setVisibility(View.VISIBLE);
                 return true;
+            case R.id.specificSearch:
+                callSearch(TEMP_PRODUCT.getProductName() + " " + TEMP_PRODUCT.getProductInfo());
             default:
                 return false;
         }
@@ -250,23 +275,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
                 }
                 return true;
-            }
-            /*Helper function that utilises functions from the Requests Controller in order to
-            * obtain and display results. As the name suggests, this is called on search submit.*/
-            public void callSearch(String query) {
-                List<ProductModel> products = new ArrayList<>();
-                loadingBar.setVisibility(View.VISIBLE);
-                rc.getMigrosProducts(query, resultMigros -> {
-                    products.addAll(resultMigros);
-                    rc.getCoopProducts(query, resultCoop -> {
-                        products.addAll(resultCoop);
-                        ProductAdapter adapter = new ProductAdapter(MainActivity.this, dpc.sortRelevance(products, SEARCH_THRESHOLD));
-                        MainActivity.this.runOnUiThread(() -> {
-                            listView.setAdapter(adapter);
-                            loadingBar.setVisibility(View.GONE);
-                        });
-                    });
-                });
             }
         });
         /*Location button listener - ensures that the right permissions are enabled and handles
