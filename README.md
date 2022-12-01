@@ -1,6 +1,6 @@
 # Priisvergliich
 
-Priisvergliich ("Price comparison" in English) is an app that allows the user to search and compare items across Swiss supermarkets. The app takes inspiration from the once popular, unfortunately no longer, mysupermarket.co.uk. 
+Priisvergliich ("Price comparison" in English) is an app that allows the user to search and compare items across Swiss supermarkets. The app can be used to run queries across multiple supermarkets, build comparative shopping lists, find out which shop you should shop at to save you the most money (based on your shopping list), and to locate supermarkets within your vicinity.
 
 **Video Demonstration** https://youtu.be/uRpa_rX2vzw
 
